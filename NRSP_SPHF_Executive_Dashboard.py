@@ -348,45 +348,82 @@ st.download_button(
 # DISTRICT VERIFICATION
 # =========================
 
-st.subheader("District Wise Verification")
+st.subheader("✅ District Wise Verification Done")
 
-dist_rows = []
+dist_done_rows = []
 
 for district, g in df.groupby(DISTRICT):
 
-    dist_rows.append({
+    dist_done_rows.append({
 
         "District": district,
 
-        "Plinth Done":
-            yes_count(g[PLINTH]),
+        "Plinth Done": yes_count(g[PLINTH]),
+        "Lintel Done": yes_count(g[LINTEL]),
+        "Roof Done": yes_count(g[ROOF]),
+        "Completion Done": yes_count(g[COMP])
+
+    })
+
+dist_done_df = pd.DataFrame(dist_done_rows)
+
+st.dataframe(
+    dist_done_df,
+    use_container_width=True
+)
+
+csv_done = dist_done_df.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "📥 Download District Verification Done Report",
+    csv_done,
+    "District_Verification_Done.csv",
+    "text/csv"
+)
+
+# =========================
+# DISTRICT VERIFICATION PENDING
+# =========================
+
+st.subheader("⏳ District Wise Verification Pending")
+
+dist_pending_rows = []
+
+for district, g in df.groupby(DISTRICT):
+
+    dist_pending_rows.append({
+
+        "District": district,
 
         "Plinth Pending":
             len(g) - yes_count(g[PLINTH]),
 
-        "Lintel Done":
-            yes_count(g[LINTEL]),
-
         "Lintel Pending":
             len(g) - yes_count(g[LINTEL]),
 
-        "Roof Done":
-            yes_count(g[ROOF]),
-
         "Roof Pending":
             len(g) - yes_count(g[ROOF]),
-
-        "Completion Done":
-            yes_count(g[COMP]),
 
         "Completion Pending":
             len(g) - yes_count(g[COMP])
 
     })
 
-dist_df = pd.DataFrame(dist_rows)
+dist_pending_df = pd.DataFrame(dist_pending_rows)
 
-st.dataframe(dist_df, use_container_width=True)
+st.dataframe(
+    dist_pending_df,
+    use_container_width=True
+)
+
+csv_pending = dist_pending_df.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "📥 Download District Verification Pending Report",
+    csv_pending,
+    "District_Verification_Pending.csv",
+    "text/csv"
+)
 
 
 # =========================
