@@ -14,6 +14,7 @@ from reportlab.platypus import (
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import landscape, A4
 
 st.set_page_config(
     page_title="NRSP SPHF MIS Dashboard",
@@ -42,16 +43,25 @@ def create_pending_pdf(df_report, bank, installment):
 
     buffer = BytesIO()
 
-    doc = SimpleDocTemplate(buffer)
+    from reportlab.lib.pagesizes import landscape, A4
+
+doc = SimpleDocTemplate(
+    buffer,
+    pagesize=landscape(A4),
+    leftMargin=10,
+    rightMargin=10,
+    topMargin=20,
+    bottomMargin=20
+)
 
     styles = getSampleStyleSheet()
 
     elements = []
 
-    title = Paragraph(
-        f"<b>{bank} - {installment} Pending Withdrawal List</b>",
-        styles["Title"]
-    )
+title = Paragraph(
+    f"<b>NRSP - SPHF Pending Withdrawal Report</b><br/>{bank} | {installment}",
+    styles["Title"]
+)
 
     elements.append(title)
 
@@ -61,13 +71,16 @@ def create_pending_pdf(df_report, bank, installment):
 
     table_data += df_report.values.tolist()
 
-    table = Table(table_data)
+   table = Table(
+    table_data,
+    repeatRows=1
+)
 
     table.setStyle(
         TableStyle([
             ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
             ("GRID", (0,0), (-1,-1), 1, colors.black),
-            ("FONTSIZE", (0,0), (-1,-1), 8)
+            ("FONTSIZE", (0,0), (-1,-1), 7)
         ])
     )
 
