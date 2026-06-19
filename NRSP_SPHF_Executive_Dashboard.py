@@ -135,14 +135,48 @@ total_pending = p1 + p2 + p3 + p4
 # EXECUTIVE CARDS
 # =========================
 
-c1, c2, c3, c4, c5, c6 = st.columns(6)
+sp1 = yes_count(df[SPHF1])
+sp2 = yes_count(df[SPHF2])
+sp3 = yes_count(df[SPHF3])
+sp4 = yes_count(df[SPHF4])
 
-c1.metric("Total HHs", len(df))
-c2.metric("Withdrawals Done", total_done)
-c3.metric("Withdrawals Pending", total_pending)
-c4.metric("Plinth Verified", yes_count(df[PLINTH]))
-c5.metric("Roof Verified", yes_count(df[ROOF]))
-c6.metric("Completion Verified", yes_count(df[COMP]))
+total_disbursed = sp1 + sp2 + sp3 + sp4
+
+st.subheader("🏦 SPHF Disbursement Summary")
+
+r1c1, r1c2, r1c3, r1c4, r1c5 = st.columns(5)
+
+r1c1.metric("1st Disbursed", sp1)
+r1c2.metric("2nd Disbursed", sp2)
+r1c3.metric("3rd Disbursed", sp3)
+r1c4.metric("4th Disbursed", sp4)
+r1c5.metric("Total Disbursed", total_disbursed)
+
+st.divider()
+
+st.subheader("💳 Withdrawal Summary")
+
+r2c1, r2c2, r2c3 = st.columns(3)
+
+r2c1.metric("Withdrawals Done", total_done)
+r2c2.metric("Withdrawals Pending", total_pending)
+
+pending_pct = round(
+    (total_pending / (total_done + total_pending)) * 100, 2
+) if (total_done + total_pending) > 0 else 0
+
+r2c3.metric("Pending %", f"{pending_pct}%")
+
+st.divider()
+
+st.subheader("🏗️ Verification Progress")
+
+r3c1, r3c2, r3c3, r3c4 = st.columns(4)
+
+r3c1.metric("Plinth Verified", yes_count(df[PLINTH]))
+r3c2.metric("Lintel Verified", yes_count(df[LINTEL]))
+r3c3.metric("Roof Verified", yes_count(df[ROOF]))
+r3c4.metric("Completion Verified", yes_count(df[COMP]))
 
 # =========================
 # SPHF DISBURSEMENT
