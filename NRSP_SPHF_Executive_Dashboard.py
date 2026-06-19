@@ -238,73 +238,111 @@ st.plotly_chart(fig1, use_container_width=True)
 
 
 # =========================
-# BANK WISE
+# BANK WISE INSTALLMENT REPORT
 # =========================
 
-st.subheader("Bank Wise Withdrawal Report")
+st.subheader("🏦 Bank Wise Installment Withdrawal Report")
 
 bank_rows = []
 
 for bank, g in df.groupby(BANK):
 
-    done = (
-        yes_count(g[WD1])
-        + yes_count(g[WD2])
-        + yes_count(g[WD3])
-        + yes_count(g[WD4])
-    )
+    d1 = yes_count(g[WD1])
+    p1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
 
-    pending = (
-        (
-            is_yes(g[SPHF1]) &
-            ~is_yes(g[WD1])
-        ).sum()
-        +
-        (
-            is_yes(g[SPHF2]) &
-            ~is_yes(g[WD2])
-        ).sum()
-        +
-        (
-            is_yes(g[SPHF3]) &
-            ~is_yes(g[WD3])
-        ).sum()
-        +
-        (
-            is_yes(g[SPHF4]) &
-            ~is_yes(g[WD4])
-        ).sum()
-    )
+    d2 = yes_count(g[WD2])
+    p2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
 
-    bank_rows.append([
-        bank,
-        done,
-        pending
-    ])
+    d3 = yes_count(g[WD3])
+    p3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
 
-bank_df = pd.DataFrame(
-    bank_rows,
-    columns=[
-        "Bank",
-        "Withdrawal Done",
-        "Withdrawal Pending"
-    ]
+    d4 = yes_count(g[WD4])
+    p4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
+
+    bank_rows.append({
+
+        "Bank": bank,
+
+        "1st Done": d1,
+        "1st Pending": p1,
+
+        "2nd Done": d2,
+        "2nd Pending": p2,
+
+        "3rd Done": d3,
+        "3rd Pending": p3,
+
+        "4th Done": d4,
+        "4th Pending": p4,
+
+        "Total Done": d1+d2+d3+d4,
+        "Total Pending": p1+p2+p3+p4
+    })
+
+bank_detail_df = pd.DataFrame(bank_rows)
+
+st.dataframe(
+    bank_detail_df,
+    use_container_width=True
 )
 
-st.dataframe(bank_df, use_container_width=True)
+# Download Button
 
-fig2 = px.bar(
-    bank_df.sort_values(
-        "Withdrawal Pending",
-        ascending=False
-    ),
-    x="Bank",
-    y="Withdrawal Pending",
-    title="Bank Wise Pending Withdrawals"
+csv_bank_detail = bank_detail_df.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "📥 Download Bank Wise Installment Report",
+    csv_bank_detail,
+    "Bank_Wise_Installment_Report.csv",
+    "text/csv"
 )
 
-st.plotly_chart(fig2, use_container_width=True)
+# =========================
+# BANK WISE WITHDRAWAL PENDING
+# =========================
 
+st.subheader("⏳ Bank Wise Withdrawal Pending")
+
+pending_rows = []
+
+for bank, g in df.groupby(BANK):
+
+    p1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
+
+    p2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
+
+    p3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
+
+    p4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
+
+    pending_rows.append({
+
+        "Bank": bank,
+
+        "1st Pending": p1,
+        "2nd Pending": p2,
+        "3rd Pending": p3,
+        "4th Pending": p4,
+
+        "Total Pending": p1 + p2 + p3 + p4
+
+    })
+
+bank_pending_df = pd.DataFrame(pending_rows)
+
+st.dataframe(
+    bank_pending_df,
+    use_container_width=True
+)
+
+csv_pending = bank_pending_df.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "📥 Download Bank Wise Pending Report",
+    csv_pending,
+    "Bank_Wise_Pending_Report.csv",
+    "text/csv"
+)
 
 # =========================
 # DISTRICT VERIFICATION
