@@ -43,38 +43,34 @@ def create_pending_pdf(df_report, bank, installment):
 
     buffer = BytesIO()
 
-    from reportlab.lib.pagesizes import landscape, A4
-
-doc = SimpleDocTemplate(
-    buffer,
-    pagesize=landscape(A4),
-    leftMargin=10,
-    rightMargin=10,
-    topMargin=20,
-    bottomMargin=20
-)
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=10,
+        rightMargin=10,
+        topMargin=20,
+        bottomMargin=20
+    )
 
     styles = getSampleStyleSheet()
 
     elements = []
 
-title = Paragraph(
-    f"<b>NRSP - SPHF Pending Withdrawal Report</b><br/>{bank} | {installment}",
-    styles["Title"]
-)
+    title = Paragraph(
+        f"<b>NRSP - SPHF Pending Withdrawal Report</b><br/>{bank} | {installment}",
+        styles["Title"]
+    )
 
     elements.append(title)
-
     elements.append(Spacer(1, 12))
 
     table_data = [list(df_report.columns)]
-
     table_data += df_report.values.tolist()
 
-   table = Table(
-    table_data,
-    repeatRows=1
-)
+    table = Table(
+        table_data,
+        repeatRows=1
+    )
 
     table.setStyle(
         TableStyle([
