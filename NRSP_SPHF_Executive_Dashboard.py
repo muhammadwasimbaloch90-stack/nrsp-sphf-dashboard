@@ -2,12 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config()
-   st.set_page_config( page_title="NRSP SPHF MIS Dashboard",
-      layout="wide", 
-      page_icon="🏠" 
+st.set_page_config(
+    page_title="NRSP SPHF MIS Dashboard",
+    layout="wide",
+    page_icon="🏠"
 )
-  
+
 EXCEL_FILE = r"D:\SPHF Project Data\Daily basis report\Tracking sheet Balochistan SPHF.xlsx"
 
 # =========================
