@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(
-   st.set_page_config( page_title="NRSP SPHF MIS Dashboard", layout="wide", page_icon="🏠" )
+st.set_page_config()
+   st.set_page_config( page_title="NRSP SPHF MIS Dashboard",
+      layout="wide", 
+      page_icon="🏠" 
+)
   
 EXCEL_FILE = r"D:\SPHF Project Data\Daily basis report\Tracking sheet Balochistan SPHF.xlsx"
 
@@ -24,6 +27,33 @@ def load_data():
     return df
 
 df = load_data()
+
+# =========================
+# HEADER WITH LOGOS
+# =========================
+
+col1, col2, col3 = st.columns([1,3,1])
+
+with col1:
+    st.image("NRSP_Logo.png", width=120)
+
+with col2:
+    st.markdown(
+        """
+        <h1 style='text-align:center;color:#006400;'>
+        NRSP - SPHF Flood Reconstruction MIS
+        </h1>
+        <div style='text-align:center;font-size:18px;'>
+        Government of Sindh | SPHF Project | NRSP
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with col3:
+    st.image("SPHF_Logo.png", width=120)
+
+st.markdown("---")
 
 
 # =========================
