@@ -2,13 +2,25 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+from io import BytesIO
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer
+)
+
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
 st.set_page_config(
     page_title="NRSP SPHF MIS Dashboard",
     layout="wide",
     page_icon="🏠"
 )
 
-EXCEL_FILE = r"D:\SPHF Project Data\Daily basis report\Tracking sheet Balochistan SPHF.xlsx"
 
 # =========================
 # LOAD DATA
