@@ -427,6 +427,98 @@ st.download_button(
 
 
 # =========================
+# PENDING WITHDRAWAL DOWNLOAD
+# =========================
+
+st.subheader("📥 Download Pending Withdrawal Beneficiary List")
+
+selected_bank = st.selectbox(
+    "🏦 Select Bank",
+    sorted(df[BANK].dropna().unique())
+)
+
+installment = st.selectbox(
+    "💳 Select Installment",
+    [
+        "1st Installment",
+        "2nd Installment",
+        "3rd Installment",
+        "4th Installment"
+    ]
+)
+
+if installment == "1st Installment":
+
+    pending_df = df[
+        is_yes(df[SPHF1]) &
+        ~is_yes(df[WD1]) &
+        (df[BANK] == selected_bank)
+    ]
+
+elif installment == "2nd Installment":
+
+    pending_df = df[
+        is_yes(df[SPHF2]) &
+        ~is_yes(df[WD2]) &
+        (df[BANK] == selected_bank)
+    ]
+
+elif installment == "3rd Installment":
+
+    pending_df = df[
+        is_yes(df[SPHF3]) &
+        ~is_yes(df[WD3]) &
+        (df[BANK] == selected_bank)
+    ]
+
+else:
+
+    pending_df = df[
+        is_yes(df[SPHF4]) &
+        ~is_yes(df[WD4]) &
+        (df[BANK] == selected_bank)
+    ]
+
+
+st.info(
+    f"Total Pending Beneficiaries: {len(pending_df)}"
+)
+
+# A to M Columns Only
+
+download_cols = [
+    "S. No.",
+    "UUID",
+    "Beneficiary Name",
+    "Father/Husband Name",
+    "Mobile Number",
+    "Gender",
+    "CNIC No.",
+    "District",
+    "Tehsil",
+    "UC",
+    "Village",
+    "Account No.",
+    "Bank"
+]
+
+pending_download = pending_df[download_cols]
+
+csv_pending = (
+    pending_download
+    .to_csv(index=False)
+    .encode("utf-8")
+)
+
+st.download_button(
+    label="📥 Download Pending Beneficiary List",
+    data=csv_pending,
+    file_name=f"{selected_bank}_{installment}_Pending_List.csv",
+    mime="text/csv"
+)
+
+
+# =========================
 # SEARCH
 # =========================
 
@@ -455,3 +547,24 @@ if search:
         result,
         use_container_width=True
     )
+
+# =========================
+# WATERMARK
+# =========================
+
+st.markdown(
+    """
+    <hr>
+    <div style="
+        text-align:center;
+        color:#888888;
+        font-size:13px;
+        opacity:0.6;
+        padding-top:20px;
+        padding-bottom:10px;
+    ">
+        Designed & Developed by Waseem Baloch
+    </div>
+    """,
+    unsafe_allow_html=True
+)
