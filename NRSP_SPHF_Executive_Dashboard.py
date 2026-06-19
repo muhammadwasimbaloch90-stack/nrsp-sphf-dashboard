@@ -26,6 +26,58 @@ def load_data():
 
     return df
 
+def create_pending_pdf(df_report, bank, installment):
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(buffer)
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    title = Paragraph(
+        f"<b>{bank} - {installment} Pending Withdrawal List</b>",
+        styles["Title"]
+    )
+
+    elements.append(title)
+
+    elements.append(Spacer(1, 12))
+
+    table_data = [list(df_report.columns)]
+
+    table_data += df_report.values.tolist()
+
+    table = Table(table_data)
+
+    table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
+            ("GRID", (0,0), (-1,-1), 1, colors.black),
+            ("FONTSIZE", (0,0), (-1,-1), 8)
+        ])
+    )
+
+    elements.append(table)
+
+    elements.append(Spacer(1, 20))
+
+    footer = Paragraph(
+        "Designed & Developed by Waseem Baloch",
+        styles["Normal"]
+    )
+
+    elements.append(footer)
+
+    doc.build(elements)
+
+    pdf = buffer.getvalue()
+
+    buffer.close()
+
+    return pdf
+
 df = load_data()
 
 # =========================
@@ -531,19 +583,18 @@ download_cols = [
 
 pending_download = pending_df[download_cols]
 
-csv_pending = (
-    pending_download
-    .to_csv(index=False)
-    .encode("utf-8")
+pdf_file = create_pending_pdf(
+    pending_download,
+    selected_bank,
+    installment
 )
 
 st.download_button(
-    label="📥 Download Pending Beneficiary List",
-    data=csv_pending,
-    file_name=f"{selected_bank}_{installment}_Pending_List.csv",
-    mime="text/csv"
+    label="📄 Download PDF Report",
+    data=pdf_file,
+    file_name=f"{selected_bank}_{installment}_Pending_List.pdf",
+    mime="application/pdf"
 )
-
 
 # =========================
 # SEARCH
