@@ -22,41 +22,6 @@ st.set_page_config(
     page_icon="🏠"
 )
 
-st.markdown("""
-<style>
-
-.main .block-container{
-    padding-top:1rem;
-    max-width:1400px;
-}
-
-[data-testid="stAppViewContainer"]{
-    background:#f8fafc;
-}
-
-div[data-testid="metric-container"]{
-    background:white;
-    padding:20px;
-    border-radius:18px;
-    border:1px solid #e5e7eb;
-    box-shadow:0 4px 20px rgba(0,0,0,0.05);
-}
-
-.hero-box{
-    background:linear-gradient(
-        135deg,
-        #067647,
-        #0ea5e9
-    );
-    padding:35px;
-    border-radius:22px;
-    color:white;
-    text-align:center;
-    margin-bottom:25px;
-}
-
-</style>
-""", unsafe_allow_html=True)
 
 # =========================
 # LOAD DATA
@@ -140,25 +105,23 @@ df = load_data()
 # HEADER WITH LOGOS
 # =========================
 
-col1,col2,col3 = st.columns([1,4,1])
+col1, col2, col3 = st.columns([1,3,1])
 
 with col1:
     st.image("NRSP_Logo.png", width=120)
 
 with col2:
-   st.markdown("""
-<div class="hero-box">
-
-<h1>
-NRSP - SPHF Flood Reconstruction MIS
-</h1>
-
-<p>
-Building Resilient Houses, Empowering Flood Affected Communities
-</p>
-
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <h1 style='text-align:center;color:#006400;'>
+        NRSP - SPHF Flood Reconstruction MIS
+        </h1>
+        <div style='text-align:center;font-size:18px;'>
+        Govt: Of Balochistan | SPHF Project | NRSP
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 with col3:
     st.image("SPHF_Logo.png", width=120)
@@ -208,6 +171,12 @@ LINTEL = "Lintel Verify Yes/No"
 ROOF = "Roof Verify Yes/No"
 COMP = "Completion Yes/No"
 
+
+# =========================
+# TITLE
+# =========================
+
+st.title("🏠 NRSP - SPHF Executive MIS Dashboard")
 
 # =========================
 # FILTER
@@ -263,7 +232,7 @@ total_pending = p1 + p2 + p3 + p4
 
 
 # =========================
-# EXECUTIVE OVERVIEW
+# EXECUTIVE CARDS
 # =========================
 
 sp1 = yes_count(df[SPHF1])
@@ -273,17 +242,41 @@ sp4 = yes_count(df[SPHF4])
 
 total_disbursed = sp1 + sp2 + sp3 + sp4
 
-st.subheader("📊 Executive Overview")
+st.subheader("🏦 SPHF Disbursement Summary")
 
-c1,c2,c3,c4,c5 = st.columns(5)
+r1c1, r1c2, r1c3, r1c4, r1c5 = st.columns(5)
 
-c1.metric("Households", len(df))
-c2.metric("Disbursed", total_disbursed)
-c3.metric("Done", total_done)
-c4.metric("Pending", total_pending)
-c5.metric("Verified", yes_count(df[COMP]))
+r1c1.metric("1st Disbursed", sp1)
+r1c2.metric("2nd Disbursed", sp2)
+r1c3.metric("3rd Disbursed", sp3)
+r1c4.metric("4th Disbursed", sp4)
+r1c5.metric("Total Disbursed", total_disbursed)
 
 st.divider()
+
+st.subheader("💳 Withdrawal Summary")
+
+r2c1, r2c2, r2c3 = st.columns(3)
+
+r2c1.metric("Withdrawals Done", total_done)
+r2c2.metric("Withdrawals Pending", total_pending)
+
+pending_pct = round(
+    (total_pending / (total_done + total_pending)) * 100, 2
+) if (total_done + total_pending) > 0 else 0
+
+r2c3.metric("Pending %", f"{pending_pct}%")
+
+st.divider()
+
+st.subheader("🏗️ Verification Progress")
+
+r3c1, r3c2, r3c3, r3c4 = st.columns(4)
+
+r3c1.metric("Plinth Verified", yes_count(df[PLINTH]))
+r3c2.metric("Lintel Verified", yes_count(df[LINTEL]))
+r3c3.metric("Roof Verified", yes_count(df[ROOF]))
+r3c4.metric("Completion Verified", yes_count(df[COMP]))
 
 # =========================
 # SPHF DISBURSEMENT
@@ -654,25 +647,23 @@ if search:
         use_container_width=True
     )
 
+# =========================
+# WATERMARK
+# =========================
 
-st.markdown(f"""
-<hr>
-
-<div style='text-align:center;color:#6b7280;'>
-
-NRSP - SPHF Flood Reconstruction MIS
-
-<br>
-
-Version 3.0
-
-<br>
-
-Last Updated: {pd.Timestamp.now().strftime("%d-%b-%Y %I:%M %p")}
-
-<br>
-
-Designed & Developed by Waseem Baloch
-
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    """
+    <hr>
+    <div style="
+        text-align:center;
+        color:#888888;
+        font-size:13px;
+        opacity:0.6;
+        padding-top:20px;
+        padding-bottom:10px;
+    ">
+        Designed & Developed by Waseem Baloch
+    </div>
+    """,
+    unsafe_allow_html=True
+)
