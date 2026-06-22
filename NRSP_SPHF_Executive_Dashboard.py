@@ -173,12 +173,6 @@ COMP = "Completion Yes/No"
 
 
 # =========================
-# TITLE
-# =========================
-
-st.title("🏠 NRSP - SPHF Executive MIS Dashboard")
-
-# =========================
 # FILTER
 # =========================
 
