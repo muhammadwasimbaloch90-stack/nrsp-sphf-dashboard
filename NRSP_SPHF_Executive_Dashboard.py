@@ -22,6 +22,49 @@ st.set_page_config(
     page_icon="🏠"
 )
 
+st.markdown("""
+<style>
+
+.main{
+    background-color:#f5f7fa;
+}
+
+div[data-testid="metric-container"]{
+    background:white;
+    border-left:5px solid #0f766e;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0px 2px 8px rgba(0,0,0,0.08);
+}
+
+h1{
+    color:#0f766e;
+}
+
+h2{
+    color:#14532d;
+}
+
+.stButton>button{
+    background:#0f766e;
+    color:white;
+    border-radius:8px;
+    border:none;
+}
+
+.stDownloadButton>button{
+    background:#14532d;
+    color:white;
+    border-radius:8px;
+}
+
+section[data-testid="stSidebar"]{
+    background:#e8f5f3;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 
 # =========================
 # LOAD DATA
@@ -105,23 +148,25 @@ df = load_data()
 # HEADER WITH LOGOS
 # =========================
 
-col1, col2, col3 = st.columns([1,3,1])
+col1,col2,col3 = st.columns([1,4,1])
 
 with col1:
     st.image("NRSP_Logo.png", width=120)
 
 with col2:
-    st.markdown(
-        """
-        <h1 style='text-align:center;color:#006400;'>
-        NRSP - SPHF Flood Reconstruction MIS
-        </h1>
-        <div style='text-align:center;font-size:18px;'>
-        Government of Sindh | SPHF Project | NRSP
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div style='text-align:center;'>
+
+    <h1>NRSP - SPHF Flood Reconstruction MIS</h1>
+
+    <h4>Government of Sindh | NRSP Balochistan Region</h4>
+
+    <p>
+    Building Resilient Houses, Empowering Flood Affected Communities
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
 
 with col3:
     st.image("SPHF_Logo.png", width=120)
@@ -171,12 +216,6 @@ LINTEL = "Lintel Verify Yes/No"
 ROOF = "Roof Verify Yes/No"
 COMP = "Completion Yes/No"
 
-
-# =========================
-# TITLE
-# =========================
-
-st.title("🏠 NRSP - SPHF Executive MIS Dashboard")
 
 # =========================
 # FILTER
@@ -647,23 +686,21 @@ if search:
         use_container_width=True
     )
 
-# =========================
-# WATERMARK
-# =========================
 
-st.markdown(
-    """
-    <hr>
-    <div style="
-        text-align:center;
-        color:#888888;
-        font-size:13px;
-        opacity:0.6;
-        padding-top:20px;
-        padding-bottom:10px;
-    ">
-        Designed & Developed by Waseem Baloch
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<hr>
+
+<div style='text-align:center;color:gray;'>
+
+NRSP - SPHF Flood Reconstruction MIS
+
+<br>
+
+Version 2.0
+
+<br>
+
+Designed & Developed by Waseem Baloch
+
+</div>
+""", unsafe_allow_html=True)
