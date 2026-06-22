@@ -159,7 +159,7 @@ with col2:
 
     <h1>NRSP - SPHF Flood Reconstruction MIS</h1>
 
-    <h4>Government of Balochistan | NRSP District Office Jaffarabad/h4>
+    <h4>Government of Balochistan | NRSP District Office Jaffarabad</h4>
 
     <p>
     Sindh People Housing for flood Affectees SPHF
