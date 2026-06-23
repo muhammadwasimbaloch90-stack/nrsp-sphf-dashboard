@@ -67,8 +67,7 @@ def load_data():
 
 def create_pending_pdf(df_report, bank, installment):
 
-```
-buffer = BytesIO()
+    buffer = BytesIO()
 
 doc = SimpleDocTemplate(
     buffer,
@@ -167,7 +166,8 @@ pdf = buffer.getvalue()
 buffer.close()
 
 return pdf
-```
+
+df = load_data()
 
 # =========================
 # HEADER WITH LOGOS
@@ -210,6 +210,8 @@ def is_yes(series):
         .eq("YES")
     )
 
+def yes_count(series):
+    return is_yes(series).sum()
 
 def no_remarks(series):
     return (
@@ -218,7 +220,7 @@ def no_remarks(series):
         .str.strip()
         .eq("")
     )
-
+    
 
 # =========================
 # COLUMN NAMES
@@ -243,6 +245,7 @@ PLINTH = "Plinth Verify Yes/No"
 LINTEL = "Lintel Verify Yes/No"
 ROOF = "Roof Verify Yes/No"
 COMP = "Completion Yes/No"
+REMARKS = "Remarks"
 
 
 # =========================
@@ -269,8 +272,6 @@ if selected_district != "All":
 # =========================
 # INSTALLMENT LOGIC
 # =========================
-
-# INSTALLMENT LOGIC
 
 d1 = yes_count(df[WD1])
 p1 = (
@@ -302,7 +303,6 @@ p4 = (
 
 total_done = d1 + d2 + d3 + d4
 total_pending = p1 + p2 + p3 + p4
-
 
 # =========================
 # EXECUTIVE CARDS
@@ -737,19 +737,20 @@ search = st.text_input(
 if search:
 
     result = df[
-        df.astype(str)
-        .apply(
-            lambda col:
-            col.str.contains(
-                search,
-                case=False,
+df.astype(str)
+    .apply(
+     lambda col:
+    col.str.contains(
+            search,
+            case=False,
                 na=False
             )
         )
         .any(axis=1)
     ]
 
-   st.dataframe(
+
+       st.dataframe(
     result.style
     .highlight_max(axis=0)
     .set_properties(
