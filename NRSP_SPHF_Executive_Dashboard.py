@@ -9,7 +9,8 @@ from reportlab.platypus import (
     Table,
     TableStyle,
     Paragraph,
-    Spacer
+    Spacer,
+    Image
 )
 
 from reportlab.lib import colors
@@ -22,6 +23,31 @@ st.set_page_config(
     page_icon="🏠"
 )
 
+# =========================
+# LOGIN SYSTEM
+# =========================
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+
+    st.title("🔐 NRSP SPHF MIS Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+
+        if username == "nrspmis" and password == "nrsp@321":
+
+            st.session_state.logged_in = True
+            st.rerun()
+
+        else:
+            st.error("Invalid Username or Password")
+
+    st.stop()
 
 # =========================
 # LOAD DATA
@@ -53,6 +79,26 @@ def create_pending_pdf(df_report, bank, installment):
     )
 
     styles = getSampleStyleSheet()
+
+    logo1 = Image(
+    "NRSP_Logo.png",
+    width=60,
+    height=60
+)
+
+logo2 = Image(
+    "SPHF_Logo.png",
+    width=60,
+    height=60
+)
+
+logo_table = Table(
+    [[logo1, logo2]],
+    colWidths=[350, 350]
+)
+
+elements.append(logo_table)
+elements.append(Spacer(1, 10))
 
     elements = []
 
@@ -143,8 +189,13 @@ def is_yes(series):
     )
 
 
-def yes_count(series):
-    return is_yes(series).sum()
+def no_remarks(series):
+    return (
+        series.fillna("")
+        .astype(str)
+        .str.strip()
+        .eq("")
+    )
 
 
 # =========================
@@ -197,28 +248,34 @@ if selected_district != "All":
 # INSTALLMENT LOGIC
 # =========================
 
+# INSTALLMENT LOGIC
+
 d1 = yes_count(df[WD1])
 p1 = (
     is_yes(df[SPHF1]) &
-    ~is_yes(df[WD1])
+    ~is_yes(df[WD1]) &
+    no_remarks(df[REMARKS])
 ).sum()
 
 d2 = yes_count(df[WD2])
 p2 = (
     is_yes(df[SPHF2]) &
-    ~is_yes(df[WD2])
+    ~is_yes(df[WD2]) &
+    no_remarks(df[REMARKS])
 ).sum()
 
 d3 = yes_count(df[WD3])
 p3 = (
     is_yes(df[SPHF3]) &
-    ~is_yes(df[WD3])
+    ~is_yes(df[WD3]) &
+    no_remarks(df[REMARKS])
 ).sum()
 
 d4 = yes_count(df[WD4])
 p4 = (
     is_yes(df[SPHF4]) &
-    ~is_yes(df[WD4])
+    ~is_yes(df[WD4]) &
+    no_remarks(df[REMARKS])
 ).sum()
 
 total_done = d1 + d2 + d3 + d4
@@ -544,35 +601,38 @@ installment = st.selectbox(
 if installment == "1st Installment":
 
     pending_df = df[
-        is_yes(df[SPHF1]) &
-        ~is_yes(df[WD1]) &
-        (df[BANK] == selected_bank)
-    ]
+    is_yes(df[SPHF1]) &
+    ~is_yes(df[WD1]) &
+    no_remarks(df[REMARKS]) &
+    (df[BANK] == selected_bank)
+]
 
 elif installment == "2nd Installment":
 
     pending_df = df[
-        is_yes(df[SPHF2]) &
-        ~is_yes(df[WD2]) &
-        (df[BANK] == selected_bank)
-    ]
+    is_yes(df[SPHF2]) &
+    ~is_yes(df[WD2]) &
+    no_remarks(df[REMARKS]) &
+    (df[BANK] == selected_bank)
+]
 
 elif installment == "3rd Installment":
 
     pending_df = df[
-        is_yes(df[SPHF3]) &
-        ~is_yes(df[WD3]) &
-        (df[BANK] == selected_bank)
-    ]
-
+    is_yes(df[SPHF3]) &
+    ~is_yes(df[WD3]) &
+    no_remarks(df[REMARKS]) &
+    (df[BANK] == selected_bank)
+]
+    
 else:
 
     pending_df = df[
-        is_yes(df[SPHF4]) &
-        ~is_yes(df[WD4]) &
-        (df[BANK] == selected_bank)
-    ]
-
+    is_yes(df[SPHF4]) &
+    ~is_yes(df[WD4]) &
+    no_remarks(df[REMARKS]) &
+    (df[BANK] == selected_bank)
+]
 
 st.info(
     f"Total Pending Beneficiaries: {len(pending_df)}"
@@ -611,6 +671,37 @@ st.download_button(
     mime="application/pdf"
 )
 
+
+# =========================
+# REMARKS
+# =========================
+
+st.subheader("📝 AH Remarks Cases")
+
+remarks_df = df[
+    df[REMARKS]
+    .fillna("")
+    .astype(str)
+    .str.strip()
+    != ""
+]
+
+st.info(f"Total AH Remarks Cases: {len(remarks_df)}")
+
+st.dataframe(
+    remarks_df[
+        [
+            "UUID",
+            "Beneficiary Name",
+            "District",
+            "Bank",
+            "Remarks"
+        ]
+    ],
+    use_container_width=True
+)
+
+
 # =========================
 # SEARCH
 # =========================
@@ -636,10 +727,18 @@ if search:
         .any(axis=1)
     ]
 
-    st.dataframe(
-        result,
-        use_container_width=True
-    )
+   st.dataframe(
+    result.style
+    .highlight_max(axis=0)
+    .set_properties(
+        **{
+            "background-color": "#F8F9FA",
+            "color": "black",
+            "border": "1px solid #ddd"
+        }
+    ),
+    use_container_width=True
+)
 
 # =========================
 # WATERMARK
