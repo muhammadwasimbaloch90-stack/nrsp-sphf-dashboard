@@ -39,7 +39,7 @@ if not st.session_state.logged_in:
 
     if st.button("Login"):
 
-        if username == "nrspmis" and password == "nrsp@321":
+        if username == "nrspmis" and password == "nrsp098":
 
             st.session_state.logged_in = True
             st.rerun()
