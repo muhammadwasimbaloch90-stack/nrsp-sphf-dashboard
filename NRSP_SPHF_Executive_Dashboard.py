@@ -781,31 +781,24 @@ st.subheader("👥 NRSP Project Staff")
 
 staff_df = load_staff()
 
-cols = st.columns(4)
+# Column names clean kar do
+staff_df.columns = staff_df.columns.str.strip()
+
+cols = st.columns(3)
 
 for i, (_, row) in enumerate(staff_df.iterrows()):
 
-    with cols[i % 4]:
+    with cols[i % 3]:
 
-        try:
-            st.image(
-                row["Photo URL"],
-                width=150
-            )
-        except:
-            pass
+        # Picture agar ho to show karo
+        if "Pic URL" in staff_df.columns and pd.notna(row["Pic URL"]) and str(row["Pic URL"]).strip() != "":
+            try:
+                st.image(row["Pic URL"], width=150)
+            except:
+                pass
 
-        st.markdown(
-            f"### {row['Name']}"
-        )
-
-        st.write(
-            f"**{row['Designation']}**"
-        )
-
-        st.caption(
-            row["District"]
-        )
+        st.markdown(f"### {row['Name']}")
+        st.write(f"**{row['Designation']}**")
         
 # =========================
 # WATERMARK
