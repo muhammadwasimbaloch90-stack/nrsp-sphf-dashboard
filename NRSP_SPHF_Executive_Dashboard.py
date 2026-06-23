@@ -737,32 +737,22 @@ search = st.text_input(
 if search:
 
     result = df[
-df.astype(str)
-    .apply(
-     lambda col:
-    col.str.contains(
-            search,
-            case=False,
+        df.astype(str)
+        .apply(
+            lambda col: col.str.contains(
+                search,
+                case=False,
                 na=False
             )
         )
         .any(axis=1)
     ]
 
-
-       st.dataframe(
-    result.style
-    .highlight_max(axis=0)
-    .set_properties(
-        **{
-            "background-color": "#F8F9FA",
-            "color": "black",
-            "border": "1px solid #ddd"
-        }
-    ),
-    use_container_width=True
-)
-
+    st.dataframe(
+        result,
+        use_container_width=True
+    )
+    
 # =========================
 # WATERMARK
 # =========================
