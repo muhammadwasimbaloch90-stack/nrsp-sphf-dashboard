@@ -67,20 +67,27 @@ def load_data():
 
 def create_pending_pdf(df_report, bank, installment):
 
-    buffer = BytesIO()
+```
+buffer = BytesIO()
 
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        leftMargin=10,
-        rightMargin=10,
-        topMargin=20,
-        bottomMargin=20
-    )
+doc = SimpleDocTemplate(
+    buffer,
+    pagesize=landscape(A4),
+    leftMargin=10,
+    rightMargin=10,
+    topMargin=20,
+    bottomMargin=20
+)
 
-    styles = getSampleStyleSheet()
+styles = getSampleStyleSheet()
 
-    logo1 = Image(
+elements = []
+
+# =========================
+# LOGOS
+# =========================
+
+logo1 = Image(
     "NRSP_Logo.png",
     width=60,
     height=60
@@ -100,52 +107,67 @@ logo_table = Table(
 elements.append(logo_table)
 elements.append(Spacer(1, 10))
 
-    elements = []
+# =========================
+# TITLE
+# =========================
 
-    title = Paragraph(
-        f"<b>NRSP - SPHF Pending Withdrawal Report</b><br/>{bank} | {installment}",
-        styles["Title"]
-    )
+title = Paragraph(
+    f"""
+    <para align='center'>
+    <b>NRSP - SPHF Flood Reconstruction Project</b><br/>
+    Pending Withdrawal Report<br/>
+    {bank} | {installment}
+    </para>
+    """,
+    styles["Title"]
+)
 
-    elements.append(title)
-    elements.append(Spacer(1, 12))
+elements.append(title)
+elements.append(Spacer(1, 12))
 
-    table_data = [list(df_report.columns)]
-    table_data += df_report.values.tolist()
+# =========================
+# TABLE
+# =========================
 
-    table = Table(
-        table_data,
-        repeatRows=1
-    )
+table_data = [list(df_report.columns)]
+table_data += df_report.values.tolist()
 
-    table.setStyle(
-        TableStyle([
-            ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
-            ("GRID", (0,0), (-1,-1), 1, colors.black),
-            ("FONTSIZE", (0,0), (-1,-1), 7)
-        ])
-    )
+table = Table(
+    table_data,
+    repeatRows=1
+)
 
-    elements.append(table)
+table.setStyle(
+    TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+        ("FONTSIZE", (0, 0), (-1, -1), 7),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER")
+    ])
+)
 
-    elements.append(Spacer(1, 20))
+elements.append(table)
+elements.append(Spacer(1, 20))
 
-    footer = Paragraph(
-        "Designed & Developed by Waseem Baloch",
-        styles["Normal"]
-    )
+# =========================
+# FOOTER
+# =========================
 
-    elements.append(footer)
+footer = Paragraph(
+    "Designed & Developed by Waseem Baloch",
+    styles["Normal"]
+)
 
-    doc.build(elements)
+elements.append(footer)
 
-    pdf = buffer.getvalue()
+doc.build(elements)
 
-    buffer.close()
+pdf = buffer.getvalue()
 
-    return pdf
+buffer.close()
 
-df = load_data()
+return pdf
+```
 
 # =========================
 # HEADER WITH LOGOS
