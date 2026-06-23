@@ -88,13 +88,13 @@ def create_pending_pdf(df_report, bank, installment):
 
     logo1 = Image(
         "NRSP_Logo.png",
-        width=90,
+        width=40,
         height=90
     )
 
     logo2 = Image(
         "SPHF_Logo.png",
-        width=90,
+        width=40,
         height=90
     )
 
