@@ -75,7 +75,12 @@ def load_staff():
 
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={STAFF_GID}"
 
-    return pd.read_csv(url)
+    df = pd.read_csv(url)
+
+    # Header names clean karo
+    df.columns = df.columns.str.strip()
+
+    return df
 
 def create_pending_pdf(df_report, bank, installment):
 
