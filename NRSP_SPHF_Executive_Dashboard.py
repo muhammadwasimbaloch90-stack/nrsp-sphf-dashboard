@@ -55,6 +55,7 @@ if not st.session_state.logged_in:
 
 @st.cache_data(ttl=60)
 def load_data():
+    
 
     SHEET_ID = "1DefXTvqGRyq8lW7fF9Ud7ePhmi9W_Le-gYeRcImG26c"
     GID = "2141693356"
@@ -64,6 +65,17 @@ def load_data():
     df = pd.read_csv(url)
 
     return df
+
+STAFF_GID = "224345141"
+
+@st.cache_data
+def load_staff():
+
+    SHEET_ID = "1DefXTvqGRyq8lW7fF9Ud7ePhmi9W_Le-gYeRcImG26c"
+
+    url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={STAFF_GID}"
+
+    return pd.read_csv(url)
 
 def create_pending_pdf(df_report, bank, installment):
 
@@ -760,7 +772,41 @@ if search:
         result,
         use_container_width=True
     )
-    
+
+# =========================
+# PROJECT STAFF
+# =========================
+
+st.subheader("👥 NRSP Project Staff")
+
+staff_df = load_staff()
+
+cols = st.columns(4)
+
+for i, (_, row) in enumerate(staff_df.iterrows()):
+
+    with cols[i % 4]:
+
+        try:
+            st.image(
+                row["Photo URL"],
+                width=150
+            )
+        except:
+            pass
+
+        st.markdown(
+            f"### {row['Name']}"
+        )
+
+        st.write(
+            f"**{row['Designation']}**"
+        )
+
+        st.caption(
+            row["District"]
+        )
+        
 # =========================
 # WATERMARK
 # =========================
