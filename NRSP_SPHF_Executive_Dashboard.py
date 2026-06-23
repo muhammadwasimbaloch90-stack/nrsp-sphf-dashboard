@@ -69,104 +69,104 @@ def create_pending_pdf(df_report, bank, installment):
 
     buffer = BytesIO()
 
-doc = SimpleDocTemplate(
-    buffer,
-    pagesize=landscape(A4),
-    leftMargin=10,
-    rightMargin=10,
-    topMargin=20,
-    bottomMargin=20
-)
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=10,
+        rightMargin=10,
+        topMargin=20,
+        bottomMargin=20
+    )
 
-styles = getSampleStyleSheet()
+    styles = getSampleStyleSheet()
 
-elements = []
+    elements = []
 
-# =========================
-# LOGOS
-# =========================
+    # =========================
+    # LOGOS
+    # =========================
 
-logo1 = Image(
-    "NRSP_Logo.png",
-    width=60,
-    height=60
-)
+    logo1 = Image(
+        "NRSP_Logo.png",
+        width=60,
+        height=60
+    )
 
-logo2 = Image(
-    "SPHF_Logo.png",
-    width=60,
-    height=60
-)
+    logo2 = Image(
+        "SPHF_Logo.png",
+        width=60,
+        height=60
+    )
 
-logo_table = Table(
-    [[logo1, logo2]],
-    colWidths=[350, 350]
-)
+    logo_table = Table(
+        [[logo1, logo2]],
+        colWidths=[350, 350]
+    )
 
-elements.append(logo_table)
-elements.append(Spacer(1, 10))
+    elements.append(logo_table)
+    elements.append(Spacer(1, 10))
 
-# =========================
-# TITLE
-# =========================
+    # =========================
+    # TITLE
+    # =========================
 
-title = Paragraph(
-    f"""
-    <para align='center'>
-    <b>NRSP - SPHF Flood Reconstruction Project</b><br/>
-    Pending Withdrawal Report<br/>
-    {bank} | {installment}
-    </para>
-    """,
-    styles["Title"]
-)
+    title = Paragraph(
+        f"""
+        <para align='center'>
+        <b>NRSP - SPHF Flood Reconstruction Project</b><br/>
+        Pending Withdrawal Report<br/>
+        {bank} | {installment}
+        </para>
+        """,
+        styles["Title"]
+    )
 
-elements.append(title)
-elements.append(Spacer(1, 12))
+    elements.append(title)
+    elements.append(Spacer(1, 12))
 
-# =========================
-# TABLE
-# =========================
+    # =========================
+    # TABLE
+    # =========================
 
-table_data = [list(df_report.columns)]
-table_data += df_report.values.tolist()
+    table_data = [list(df_report.columns)]
+    table_data += df_report.values.tolist()
 
-table = Table(
-    table_data,
-    repeatRows=1
-)
+    table = Table(
+        table_data,
+        repeatRows=1
+    )
 
-table.setStyle(
-    TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("GRID", (0, 0), (-1, -1), 1, colors.black),
-        ("FONTSIZE", (0, 0), (-1, -1), 7),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER")
-    ])
-)
+    table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("FONTSIZE", (0, 0), (-1, -1), 7),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER")
+        ])
+    )
 
-elements.append(table)
-elements.append(Spacer(1, 20))
+    elements.append(table)
+    elements.append(Spacer(1, 20))
 
-# =========================
-# FOOTER
-# =========================
+    # =========================
+    # FOOTER
+    # =========================
 
-footer = Paragraph(
-    "Designed & Developed by Waseem Baloch",
-    styles["Normal"]
-)
+    footer = Paragraph(
+        "Designed & Developed by Waseem Baloch",
+        styles["Normal"]
+    )
 
-elements.append(footer)
+    elements.append(footer)
 
-doc.build(elements)
+    doc.build(elements)
 
-pdf = buffer.getvalue()
+    pdf = buffer.getvalue()
 
-buffer.close()
+    buffer.close()
 
-return pdf
-
+    return pdf
+    
 df = load_data()
 
 # =========================
