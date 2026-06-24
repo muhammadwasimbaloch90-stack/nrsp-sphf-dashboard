@@ -785,8 +785,6 @@ if search:
 st.subheader("👥 NRSP Project Staff")
 
 staff_df = load_staff()
-
-# Column names clean kar do
 staff_df.columns = staff_df.columns.str.strip()
 
 cols = st.columns(3)
@@ -795,15 +793,51 @@ for i, (_, row) in enumerate(staff_df.iterrows()):
 
     with cols[i % 3]:
 
-        # Picture agar ho to show karo
-        if "Pic URL" in staff_df.columns and pd.notna(row["Pic URL"]) and str(row["Pic URL"]).strip() != "":
+        designation = str(row["Designation"]).replace("**", "").strip()
+
+        st.markdown(
+            f"""
+            <div style="
+                border:1px solid #e0e0e0;
+                border-radius:15px;
+                padding:15px;
+                text-align:center;
+                box-shadow:0px 2px 10px rgba(0,0,0,0.08);
+                margin-bottom:20px;
+                background-color:white;
+            ">
+            """,
+            unsafe_allow_html=True
+        )
+
+        if (
+            "Pic URL" in staff_df.columns
+            and pd.notna(row["Pic URL"])
+            and str(row["Pic URL"]).strip() != ""
+        ):
             try:
                 st.image(row["Pic URL"], width=150)
             except:
                 pass
 
-        st.markdown(f"### {row['Name']}")
-        st.write(f"**{row['Designation']}**")
+        st.markdown(
+            f"""
+            <h4 style="color:#006400;">
+                {row['Name']}
+            </h4>
+
+            <p style="
+                color:#555;
+                font-size:15px;
+                font-weight:bold;
+            ">
+                {designation}
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
         
 # =========================
 # WATERMARK
