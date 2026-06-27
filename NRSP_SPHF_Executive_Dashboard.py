@@ -160,7 +160,7 @@ def create_pending_pdf(df_report, bank, installment):
     if "Remarks" not in df_report.columns:
 
 # Column Order
-    table_columns = [
+table_columns = [
     "S. No.",
     "UUID",
     "Beneficiary Name",
