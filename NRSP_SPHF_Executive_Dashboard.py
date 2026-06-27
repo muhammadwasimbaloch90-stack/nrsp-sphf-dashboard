@@ -211,11 +211,6 @@ table = Table(
     repeatRows=1
 )
 
-    table = Table(
-        table_data,
-        colWidths=col_widths,
-        repeatRows=1
-    )
 
     table.setStyle(
         TableStyle([
