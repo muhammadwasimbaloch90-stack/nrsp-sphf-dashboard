@@ -155,7 +155,7 @@ def create_pending_pdf(df_report, bank, installment):
 # TABLE
 # =========================
 
-        if "Remarks" not in df_report.columns:
+    if "Remarks" not in df_report.columns:
         df_report["Remarks"] = ""
 
     table_columns = [
