@@ -236,7 +236,7 @@ table.setStyle(
     )
 
 elements.append(table)
-    elements.append(Spacer(1, 15))
+elements.append(Spacer(1, 15))
 
     # =========================
     # FOOTER
