@@ -720,6 +720,102 @@ st.download_button(
 
 
 # =========================
+# STAGE VERIFICATION PENDING DOWNLOAD
+# =========================
+
+st.subheader("🏗 Stage Verification Pending Download")
+
+stage = st.selectbox(
+    "Select Stage",
+    [
+        "Plinth",
+        "Lintel",
+        "Roof",
+        "Completion"
+    ]
+)
+
+bank_option = st.selectbox(
+    "🏦 Select Bank",
+    ["All"] + sorted(df[BANK].dropna().unique().tolist())
+)
+
+district_option = st.selectbox(
+    "📍 Select District",
+    ["All"] + sorted(df[DISTRICT].dropna().unique().tolist())
+)
+
+stage_df = df.copy()
+
+if bank_option != "All":
+    stage_df = stage_df[
+        stage_df[BANK] == bank_option
+    ]
+
+if district_option != "All":
+    stage_df = stage_df[
+        stage_df[DISTRICT] == district_option
+    ]
+
+# --------------------------
+# PLINTH
+# --------------------------
+
+if stage == "Plinth":
+
+    stage_df = stage_df[
+        is_yes(stage_df[SPHF1]) &
+        is_yes(stage_df[WD1]) &
+        ~is_yes(stage_df[PLINTH])
+    ]
+
+# --------------------------
+# LINTEL
+# --------------------------
+
+elif stage == "Lintel":
+
+    stage_df = stage_df[
+        is_yes(stage_df[SPHF2]) &
+        is_yes(stage_df[WD2]) &
+        ~is_yes(stage_df[LINTEL])
+    ]
+
+# --------------------------
+# ROOF
+# --------------------------
+
+elif stage == "Roof":
+
+    stage_df = stage_df[
+        is_yes(stage_df[SPHF3]) &
+        is_yes(stage_df[WD3]) &
+        ~is_yes(stage_df[ROOF])
+    ]
+
+# --------------------------
+# COMPLETION
+# --------------------------
+
+else:
+
+    stage_df = stage_df[
+        is_yes(stage_df[SPHF4]) &
+        is_yes(stage_df[WD4]) &
+        ~is_yes(stage_df[COMP])
+    ]
+
+# Village A-Z
+
+stage_df = stage_df.sort_values(
+    "Village"
+)
+
+st.success(
+    f"Total {stage} Pending : {len(stage_df)}"
+)
+
+# =========================
 # REMARKS
 # =========================
 
@@ -748,6 +844,18 @@ st.dataframe(
     use_container_width=True
 )
 
+preview_cols = [
+    "UUID",
+    "Beneficiary Name",
+    "Village",
+    "Bank",
+    "District"
+]
+
+st.dataframe(
+    stage_df[preview_cols],
+    use_container_width=True
+)
 
 # =========================
 # SEARCH
