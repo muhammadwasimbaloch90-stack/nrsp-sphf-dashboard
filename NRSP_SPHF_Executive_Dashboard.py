@@ -235,7 +235,7 @@ table.setStyle(
         ])
     )
 
-    elements.append(table)
+elements.append(table)
     elements.append(Spacer(1, 15))
 
     # =========================
