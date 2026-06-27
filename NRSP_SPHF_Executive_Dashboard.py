@@ -151,26 +151,49 @@ def create_pending_pdf(df_report, bank, installment):
     elements.append(title)
     elements.append(Spacer(1, 12))
 
-    # =========================
-    # TABLE
-    # =========================
+   # =========================
+# TABLE
+# =========================
 
-    table_data = [list(df_report.columns)]
-    table_data += df_report.values.tolist()
+# Blank Remarks Column
+if "Remarks" not in df_report.columns:
+    df_report["Remarks"] = ""
 
-    col_widths = [
+# Column Order
+table_columns = [
+    "S. No.",
+    "UUID",
+    "Beneficiary Name",
+    "Father/Husband Name",
+    "Mobile Number",
+    "Gender",
+    "CNIC No.",
+    "District",
+    "Tehsil",
+    "UC",
+    "Village",
+    "Remarks"
+]
+
+df_report = df_report[table_columns]
+
+table_data = [table_columns]
+table_data += df_report.fillna("").values.tolist()
+
+# Column Widths (Landscape A4)
+col_widths = [
     25,   # S.No
     55,   # UUID
-    90,   # Beneficiary
-    100,  # Father/Husband
-    65,   # Mobile
+    85,   # Beneficiary
+    95,   # Father/Husband
+    60,   # Mobile
     35,   # Gender
-    70,   # CNIC
-    50,   # District
-    45,   # Tehsil
-    45,   # UC
-    130,  # Village
-    90    # Remarks
+    65,   # CNIC
+    45,   # District
+    40,   # Tehsil
+    40,   # UC
+    135,  # Village
+    80    # Remarks
 ]
 
 table = Table(
@@ -179,27 +202,31 @@ table = Table(
     repeatRows=1
 )
 
-    table.setStyle(
+table.setStyle(
     TableStyle([
-        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#D9D9D9")),
-        ("GRID", (0,0), (-1,-1), 0.5, colors.black),
-        ("BOX", (0,0), (-1,-1), 1, colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
 
-        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
-        ("FONTNAME",(0,1),(-1,-1),"Helvetica"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
 
-        ("FONTSIZE",(0,0),(-1,0),8),
-        ("FONTSIZE",(0,1),(-1,-1),7),
+        ("FONTSIZE", (0, 0), (-1, 0), 8),
+        ("FONTSIZE", (0, 1), (-1, -1), 7),
 
-        ("BOTTOMPADDING",(0,0),(-1,0),6),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
 
-        ("ALIGN",(0,0),(-1,-1),"CENTER"),
-        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ("BOX", (0, 0), (-1, -1), 1, colors.black),
+
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
+        ("TOPPADDING", (0, 1), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 1), (-1, -1), 4),
     ])
 )
 
-    elements.append(table)
-    elements.append(Spacer(1, 20))
+elements.append(table)
+elements.append(Spacer(1, 15))
 
     # =========================
     # FOOTER
@@ -863,7 +890,6 @@ download_cols = [
 ]
 
 stage_download = stage_df[download_cols].copy()
-
 stage_download["Remarks"] = ""
 
 # Village A-Z
