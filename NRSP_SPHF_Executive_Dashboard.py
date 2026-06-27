@@ -151,16 +151,16 @@ def create_pending_pdf(df_report, bank, installment):
     elements.append(title)
     elements.append(Spacer(1, 12))
 
-   # =========================
+# =========================
 # TABLE
 # =========================
 
-# Blank Remarks Column
-if "Remarks" not in df_report.columns:
-    df_report["Remarks"] = ""
+    # Blank Remarks Column
+
+    if "Remarks" not in df_report.columns:
 
 # Column Order
-table_columns = [
+    table_columns = [
     "S. No.",
     "UUID",
     "Beneficiary Name",
@@ -181,7 +181,7 @@ table_data = [table_columns]
 table_data += df_report.fillna("").values.tolist()
 
 # Column Widths (Landscape A4)
-col_widths = [
+    col_widths = [
     25,   # S.No
     55,   # UUID
     85,   # Beneficiary
@@ -196,13 +196,13 @@ col_widths = [
     80    # Remarks
 ]
 
-table = Table(
+    table = Table(
     table_data,
     colWidths=col_widths,
     repeatRows=1
 )
 
-table.setStyle(
+    table.setStyle(
     TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
@@ -225,10 +225,10 @@ table.setStyle(
     ])
 )
 
-elements.append(table)
-elements.append(Spacer(1, 15))
+    elements.append(table)
+    elements.append(Spacer(1, 15))
 
-  # =========================
+    # =========================
     # FOOTER
     # =========================
 
