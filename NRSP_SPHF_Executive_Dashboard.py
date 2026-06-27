@@ -136,16 +136,18 @@ def create_pending_pdf(df_report, bank, installment):
     # =========================
 
     title = Paragraph(
-        f"""
-        <para align='center'>
-        <b>NRSP - SPHF Sindh People’s Housing for Flood Affectees (SPHF)</b><br/>
-        Pending Withdrawal Report<br/>
-        {bank} | {installment}
-        </para>
-        """,
-        styles["Title"]
-    )
-
+    f"""
+    <b>NRSP - SPHF Monitoring Report</b><br/>
+    <br/>
+    Report : {installment}
+    <br/>
+    Bank : {bank}
+    <br/>
+    Total Beneficiaries : {len(df_report)}
+    """,
+    styles["Title"]
+)
+    
     elements.append(title)
     elements.append(Spacer(1, 12))
 
@@ -178,9 +180,13 @@ def create_pending_pdf(df_report, bank, installment):
     # =========================
 
     footer = Paragraph(
-        "Designed & Developed by Waseem Baloch",
-        styles["Normal"]
-    )
+    """
+    <para align='center'>
+    Designed & Developed by Waseem Baloch
+    </para>
+    """,
+    styles["Normal"]
+)
 
     elements.append(footer)
 
@@ -814,6 +820,49 @@ stage_df = stage_df.sort_values(
 st.success(
     f"Total {stage} Pending : {len(stage_df)}"
 )
+
+# =====================================
+# STAGE VERIFICATION PDF DOWNLOAD
+# =====================================
+
+download_cols = [
+    "S. No.",
+    "UUID",
+    "Beneficiary Name",
+    "Father/Husband Name",
+    "Mobile Number",
+    "Gender",
+    "CNIC No.",
+    "District",
+    "Tehsil",
+    "UC",
+    "Village",
+    "Account No.",
+    "Bank",
+    "Remarks"
+]
+
+stage_download = stage_df[download_cols].copy()
+
+# Village A-Z
+stage_download = stage_download.sort_values(
+    by="Village",
+    ascending=True
+)
+
+pdf_stage = create_pending_pdf(
+    stage_download,
+    bank_option,
+    f"{stage} Verification Pending"
+)
+
+st.download_button(
+    label="📄 Download Stage Verification Pending PDF",
+    data=pdf_stage,
+    file_name=f"{stage}_Verification_Pending.pdf",
+    mime="application/pdf"
+)
+
 
 # =========================
 # REMARKS
