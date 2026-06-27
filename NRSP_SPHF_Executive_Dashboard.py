@@ -829,33 +829,6 @@ remarks_df = df[
     != ""
 ]
 
-st.info(f"Total AH Remarks Cases: {len(remarks_df)}")
-
-st.dataframe(
-    remarks_df[
-        [
-            "UUID",
-            "Beneficiary Name",
-            "District",
-            "Bank",
-            "Remarks"
-        ]
-    ],
-    use_container_width=True
-)
-
-preview_cols = [
-    "UUID",
-    "Beneficiary Name",
-    "Village",
-    "Bank",
-    "District"
-]
-
-st.dataframe(
-    stage_df[preview_cols],
-    use_container_width=True
-)
 
 # =========================
 # SEARCH
