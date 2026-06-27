@@ -228,20 +228,26 @@ table.setStyle(
 elements.append(table)
 elements.append(Spacer(1, 15))
 
-    # =========================
+  # =========================
     # FOOTER
     # =========================
 
     footer = Paragraph(
-    """
-    <para align='center'>
-    Designed & Developed by Waseem Baloch
-    </para>
-    """,
-    styles["Normal"]
-)
+        """
+        <para align="center">
+        <font size="9">
+        Designed &amp; Developed by <b>Waseem Baloch</b>
+        </font>
+        </para>
+        """,
+        styles["Normal"]
+    )
 
     elements.append(footer)
+
+    # =========================
+    # BUILD PDF
+    # =========================
 
     doc.build(elements)
 
