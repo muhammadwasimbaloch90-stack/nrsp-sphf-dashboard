@@ -812,6 +812,12 @@ stage_df = stage_df.sort_values(
     "Village"
 )
 
+pdf_stage = create_pending_pdf(
+    stage_download,
+    bank_option,
+    f"{stage} Verification Pending"
+)
+
 st.success(
     f"Total {stage} Pending : {len(stage_df)}"
 )
@@ -826,12 +832,12 @@ download_cols = [
     "Beneficiary Name",
     "Father/Husband Name",
     "Mobile Number",
-    "Gender",
     "CNIC No.",
     "District",
     "Tehsil",
     "UC",
     "Village",
+    "bank",
     "Remarks"
 ]
 
