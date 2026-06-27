@@ -724,7 +724,6 @@ st.download_button(
     mime="application/pdf"
 )
 
-
 # =========================
 # STAGE VERIFICATION PENDING DOWNLOAD
 # =========================
@@ -739,6 +738,11 @@ stage = st.selectbox(
         "Roof",
         "Completion"
     ]
+)
+
+bank_option = st.selectbox(
+    "🏦 Select Bank",
+    ["All"] + sorted(df[BANK].dropna().unique().tolist())
 )
 
 district_option = st.selectbox(
@@ -812,12 +816,6 @@ stage_df = stage_df.sort_values(
     "Village"
 )
 
-pdf_stage = create_pending_pdf(
-    stage_download,
-    bank_option,
-    f"{stage} Verification Pending"
-)
-
 st.success(
     f"Total {stage} Pending : {len(stage_df)}"
 )
@@ -832,11 +830,13 @@ download_cols = [
     "Beneficiary Name",
     "Father/Husband Name",
     "Mobile Number",
+    "Gender",
     "CNIC No.",
     "District",
     "Tehsil",
     "UC",
     "Village",
+    "Account No.",
     "Bank",
     "Remarks"
 ]
