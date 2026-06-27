@@ -741,11 +741,6 @@ stage = st.selectbox(
     ]
 )
 
-bank_option = st.selectbox(
-    "🏦 Select Bank",
-    ["All"] + sorted(df[BANK].dropna().unique().tolist())
-)
-
 district_option = st.selectbox(
     "📍 Select District",
     ["All"] + sorted(df[DISTRICT].dropna().unique().tolist())
@@ -837,8 +832,6 @@ download_cols = [
     "Tehsil",
     "UC",
     "Village",
-    "Account No.",
-    "Bank",
     "Remarks"
 ]
 
