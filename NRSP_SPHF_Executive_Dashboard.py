@@ -158,19 +158,45 @@ def create_pending_pdf(df_report, bank, installment):
     table_data = [list(df_report.columns)]
     table_data += df_report.values.tolist()
 
-    table = Table(
-        table_data,
-        repeatRows=1
-    )
+    col_widths = [
+    25,   # S.No
+    55,   # UUID
+    90,   # Beneficiary
+    100,  # Father/Husband
+    65,   # Mobile
+    35,   # Gender
+    70,   # CNIC
+    50,   # District
+    45,   # Tehsil
+    45,   # UC
+    130,  # Village
+    90    # Remarks
+]
+
+table = Table(
+    table_data,
+    colWidths=col_widths,
+    repeatRows=1
+)
 
     table.setStyle(
-        TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),
-            ("FONTSIZE", (0, 0), (-1, -1), 7),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER")
-        ])
-    )
+    TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#D9D9D9")),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+        ("BOX", (0,0), (-1,-1), 1, colors.black),
+
+        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
+        ("FONTNAME",(0,1),(-1,-1),"Helvetica"),
+
+        ("FONTSIZE",(0,0),(-1,0),8),
+        ("FONTSIZE",(0,1),(-1,-1),7),
+
+        ("BOTTOMPADDING",(0,0),(-1,0),6),
+
+        ("ALIGN",(0,0),(-1,-1),"CENTER"),
+        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
+    ])
+)
 
     elements.append(table)
     elements.append(Spacer(1, 20))
@@ -704,9 +730,7 @@ download_cols = [
     "District",
     "Tehsil",
     "UC",
-    "Village",
-    "Account No.",
-    "Bank"
+    "Village"
 ]
 
 pending_download = pending_df[download_cols]
@@ -835,13 +859,12 @@ download_cols = [
     "District",
     "Tehsil",
     "UC",
-    "Village",
-    "Account No.",
-    "Bank",
-    "Remarks"
+    "Village"
 ]
 
 stage_download = stage_df[download_cols].copy()
+
+stage_download["Remarks"] = ""
 
 # Village A-Z
 stage_download = stage_download.sort_values(
