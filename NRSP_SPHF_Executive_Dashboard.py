@@ -837,7 +837,7 @@ download_cols = [
     "Tehsil",
     "UC",
     "Village",
-    "bank",
+    "Bank",
     "Remarks"
 ]
 
@@ -861,7 +861,6 @@ st.download_button(
     file_name=f"{stage}_Verification_Pending.pdf",
     mime="application/pdf"
 )
-
 
 # =========================
 # REMARKS
