@@ -124,7 +124,7 @@ def create_pending_pdf(df_report, bank, installment):
 
         logo_table = Table(
             [[logo1, "", logo2]],
-            colWidths=[120, 450, 120]
+                colWidths=[120, 450, 120]
         )
 
         logo_table.setStyle(
