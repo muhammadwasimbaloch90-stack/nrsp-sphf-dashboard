@@ -205,15 +205,14 @@ def create_pending_pdf(df_report, bank, installment):
         80    # Remarks
     ]
     
-table = Table(
-    table_data,
-    colWidths=col_widths,
-    repeatRows=1
-)
+    table = Table(
+        table_data,
+        colWidths=col_widths,
+        repeatRows=1
+    )
 
-
-table.setStyle(
-    TableStyle([
+    table.setStyle(
+        TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
 
@@ -235,8 +234,8 @@ table.setStyle(
         ])
     )
 
-elements.append(table)
-elements.append(Spacer(1, 15))
+    elements.append(table)
+    elements.append(Spacer(1, 15))
 
     # =========================
     # FOOTER
