@@ -212,8 +212,8 @@ table = Table(
 )
 
 
-    table.setStyle(
-        TableStyle([
+table.setStyle(
+    TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
 
