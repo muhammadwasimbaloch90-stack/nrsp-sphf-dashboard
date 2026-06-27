@@ -55,32 +55,38 @@ if not st.session_state.logged_in:
 
 @st.cache_data(ttl=60)
 def load_data():
-    
 
     SHEET_ID = "1DefXTvqGRyq8lW7fF9Ud7ePhmi9W_Le-gYeRcImG26c"
     GID = "2141693356"
 
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID}"
 
-    df = pd.read_csv(url)
+    try:
+        df = pd.read_csv(url)
+        df.columns = df.columns.str.strip()
+        return df
 
-    return df
+    except Exception as e:
+        st.error(f"Google Sheet Load Error: {e}")
+        st.stop()
 
 STAFF_GID = "224345141"
 
-@st.cache_data
+@st.cache_data(ttl=60)
 def load_staff():
 
     SHEET_ID = "1DefXTvqGRyq8lW7fF9Ud7ePhmi9W_Le-gYeRcImG26c"
 
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={STAFF_GID}"
 
-    df = pd.read_csv(url)
+    try:
+        df = pd.read_csv(url)
+        df.columns = df.columns.str.strip()
+        return df
 
-    # Header names clean karo
-    df.columns = df.columns.str.strip()
-
-    return df
+    except Exception as e:
+        st.error(f"Staff Sheet Load Error: {e}")
+        return pd.DataFrame()
 
 def create_pending_pdf(df_report, bank, installment):
 
@@ -103,33 +109,37 @@ def create_pending_pdf(df_report, bank, installment):
     # LOGOS
     # =========================
 
-    logo1 = Image(
-        "NRSP_Logo.png",
-        width=90,
-        height=40
-    )
+    try:
+        logo1 = Image(
+            "NRSP_Logo.png",
+            width=90,
+            height=40
+        )
 
-    logo2 = Image(
-        "SPHF_Logo.png",
-        width=90,
-        height=40
-    )
+        logo2 = Image(
+            "SPHF_Logo.png",
+            width=90,
+            height=40
+        )
 
-    logo_table = Table(
-        [[logo1, "", logo2]],
-        colWidths=[120, 450, 120]
-    )
+        logo_table = Table(
+            [[logo1, "", logo2]],
+            colWidths=[120, 450, 120]
+        )
 
-    logo_table.setStyle(
-    TableStyle([
-        ("ALIGN", (0, 0), (0, 0), "LEFT"),
-        ("ALIGN", (2, 0), (2, 0), "RIGHT"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE")
-    ])
-)
+        logo_table.setStyle(
+            TableStyle([
+                ("ALIGN", (0, 0), (0, 0), "LEFT"),
+                ("ALIGN", (2, 0), (2, 0), "RIGHT"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE")
+            ])
+        )
 
-    elements.append(logo_table)
-    elements.append(Spacer(1, 10))
+        elements.append(logo_table)
+        elements.append(Spacer(1, 10))
+
+    except Exception:
+        pass
 
     # =========================
     # TITLE
@@ -151,9 +161,9 @@ def create_pending_pdf(df_report, bank, installment):
     elements.append(title)
     elements.append(Spacer(1, 12))
 
-# =========================
-# TABLE
-# =========================
+    # =========================
+    # TABLE
+    # =========================
 
     if "Remarks" not in df_report.columns:
         df_report["Remarks"] = ""
@@ -173,55 +183,62 @@ def create_pending_pdf(df_report, bank, installment):
         "Remarks"
     ]
 
-df_report = df_report[table_columns]
+    available_columns = [c for c in table_columns if c in df_report.columns]
+    df_report = df_report[available_columns]
 
-table_data = [table_columns]
-table_data += df_report.fillna("").values.tolist()
+    table_data = [available_columns]
+    table_data += df_report.fillna("").values.tolist()
 
-# Column Widths (Landscape A4)
+    # Column Widths (Landscape A4)
     col_widths = [
-    25,   # S.No
-    55,   # UUID
-    85,   # Beneficiary
-    95,   # Father/Husband
-    60,   # Mobile
-    35,   # Gender
-    65,   # CNIC
-    45,   # District
-    40,   # Tehsil
-    40,   # UC
-    135,  # Village
-    80    # Remarks
-]
-
-    table = Table(
+        25,   # S.No
+        55,   # UUID
+        85,   # Beneficiary
+        95,   # Father/Husband
+        60,   # Mobile
+        35,   # Gender
+        65,   # CNIC
+        45,   # District
+        40,   # Tehsil
+        40,   # UC
+        135,  # Village
+        80    # Remarks
+    ]
+    
+table = Table(
     table_data,
     colWidths=col_widths,
     repeatRows=1
 )
 
+    table = Table(
+        table_data,
+        colWidths=col_widths,
+        repeatRows=1
+    )
+
     table.setStyle(
-    TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
 
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
 
-        ("FONTSIZE", (0, 0), (-1, 0), 8),
-        ("FONTSIZE", (0, 1), (-1, -1), 7),
+            ("FONTSIZE", (0, 0), (-1, 0), 8),
+            ("FONTSIZE", (0, 1), (-1, -1), 7),
 
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
 
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-        ("BOX", (0, 0), (-1, -1), 1, colors.black),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+            ("BOX", (0, 0), (-1, -1), 1, colors.black),
 
-        ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
-        ("TOPPADDING", (0, 1), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 1), (-1, -1), 4),
-    ])
-)
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
+            ("TOPPADDING", (0, 1), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 1), (-1, -1), 4),
+        ])
+    )
 
     elements.append(table)
     elements.append(Spacer(1, 15))
@@ -257,6 +274,55 @@ table_data += df_report.fillna("").values.tolist()
     
 df = load_data()
 
+# =========================
+# COLUMN VALIDATION
+# =========================
+
+required_columns = [
+    "District",
+    "Bank",
+
+    "SPHF 1st Disbursement status Yes/No",
+    "1st installment withdrawal Yes/No",
+
+    "SPHF 2nd Disbursement status Yes/No",
+    "2nd installment withdrawal Yes/No",
+
+    "SPHF 3rd Disbursement status Yes/No",
+    "3rd installment withdrawal Yes/No",
+
+    "SPHF 4th Disbursement status Yes/No",
+    "4th installment withdrawal Yes/No",
+
+    "Plinth Verify Yes/No",
+    "Lintel Verify Yes/No",
+    "Roof Verify Yes/No",
+    "Completion Yes/No",
+
+    "Remarks",
+
+    "UUID",
+    "CNIC No.",
+    "Beneficiary Name",
+    "Father/Husband Name",
+    "Mobile Number",
+    "Gender",
+    "Tehsil",
+    "UC",
+    "Village",
+    "S. No."
+]
+
+missing_columns = [
+    col for col in required_columns
+    if col not in df.columns
+]
+
+if missing_columns:
+    st.error("❌ Missing Columns Found in Google Sheet")
+    st.write(missing_columns)
+    st.stop()
+    
 # =========================
 # HEADER WITH LOGOS
 # =========================
@@ -695,7 +761,8 @@ st.subheader("📥 Download Pending Withdrawal Beneficiary List")
 
 selected_bank = st.selectbox(
     "🏦 Select Bank",
-    sorted(df[BANK].dropna().unique())
+    sorted(df[BANK].dropna().unique()),
+    key="pending_bank"
 )
 
 installment = st.selectbox(
@@ -797,12 +864,14 @@ stage = st.selectbox(
 
 bank_option = st.selectbox(
     "🏦 Select Bank",
-    ["All"] + sorted(df[BANK].dropna().unique().tolist())
+    ["All"] + sorted(df[BANK].dropna().unique().tolist()),
+    key="stage_bank"
 )
 
 district_option = st.selectbox(
     "📍 Select District",
-    ["All"] + sorted(df[DISTRICT].dropna().unique().tolist())
+    ["All"] + sorted(df[DISTRICT].dropna().unique().tolist()),
+    key="stage_district"
 )
 
 stage_df = df.copy()
@@ -929,36 +998,52 @@ remarks_df = df[
     != ""
 ]
 
+st.info(f"Total Remarks Cases: {len(remarks_df)}")
+
+if remarks_df.empty:
+    st.success("No Remarks Cases Found.")
+else:
+    st.dataframe(
+        remarks_df,
+        use_container_width=True
+    )
+
+    csv_remarks = remarks_df.to_csv(index=False).encode("utf-8")
+
+    st.download_button(
+        "📥 Download Remarks Report",
+        csv_remarks,
+        "AH_Remarks_Cases.csv",
+        "text/csv"
+    )
 
 # =========================
 # SEARCH
 # =========================
 
-st.subheader("Search by UUID / CNIC")
+st.subheader("🔍 Search Beneficiary")
 
 search = st.text_input(
     "Enter UUID or CNIC"
-)
+).strip()
 
 if search:
 
     result = df[
-        df.astype(str)
-        .apply(
-            lambda col: col.str.contains(
-                search,
-                case=False,
-                na=False
-            )
-        )
-        .any(axis=1)
+        df["UUID"].astype(str).str.contains(search, case=False, na=False)
+        |
+        df["CNIC No."].astype(str).str.contains(search, case=False, na=False)
     ]
 
-    st.dataframe(
-        result,
-        use_container_width=True
-    )
+    st.success(f"Total Records Found: {len(result)}")
 
+    if result.empty:
+        st.warning("No record found.")
+    else:
+        st.dataframe(
+            result,
+            use_container_width=True
+        )
 # =========================
 # PROJECT STAFF
 # =========================
