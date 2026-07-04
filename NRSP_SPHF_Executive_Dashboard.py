@@ -475,7 +475,7 @@ r1c5.metric("Total Disbursed", total_disbursed)
 
 st.divider()
 
-st.subheader("💳 Withdrawal Summary")
+st.subheader("Overall Trenches Withdrawal Summary")
 
 r2c1, r2c2, r2c3 = st.columns(3)
 
