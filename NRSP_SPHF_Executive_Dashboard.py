@@ -165,45 +165,64 @@ def create_pending_pdf(df_report, bank, installment):
     # TABLE
     # =========================
 
-    if "Remarks" not in df_report.columns:
-        df_report["Remarks"] = ""
 
-    table_columns = [
-        "S. No.",
-        "UUID",
-        "Beneficiary Name",
-        "Father/Husband Name",
-        "Mobile Number",
-        "Gender",
-        "CNIC No.",
-        "District",
-        "Tehsil",
-        "UC",
-        "Village",
-        "Remarks"
-    ]
-
-    available_columns = [c for c in table_columns if c in df_report.columns]
-    df_report = df_report[available_columns]
+    # Use exactly the columns received from caller
+    available_columns = df_report.columns.tolist()
 
     table_data = [available_columns]
     table_data += df_report.fillna("").values.tolist()
 
-    # Column Widths (Landscape A4)
-    col_widths = [
-        25,   # S.No
-        55,   # UUID
-        85,   # Beneficiary
-        95,   # Father/Husband
-        60,   # Mobile
-        35,   # Gender
-        65,   # CNIC
-        45,   # District
-        40,   # Tehsil
-        40,   # UC
-        135,  # Village
-        80    # Remarks
-    ]
+    table_data = [available_columns]
+    table_data += df_report.fillna("").values.tolist()
+
+    col_widths = []
+
+for col in available_columns:
+
+    if col == "S. No.":
+        col_widths.append(25)
+
+    elif col == "UUID":
+        col_widths.append(55)
+
+    elif col == "Beneficiary Name":
+        col_widths.append(90)
+
+    elif col == "Father/Husband Name":
+        col_widths.append(100)
+
+    elif col == "Mobile Number":
+        col_widths.append(70)
+
+    elif col == "Gender":
+        col_widths.append(40)
+
+    elif col == "CNIC No.":
+        col_widths.append(75)
+
+    elif col == "District":
+        col_widths.append(55)
+
+    elif col == "Tehsil":
+        col_widths.append(50)
+
+    elif col == "UC":
+        col_widths.append(45)
+
+    elif col == "Village":
+        col_widths.append(110)
+
+    elif col == "Account No.":
+        col_widths.append(95)
+
+    elif col == "Bank":
+        col_widths.append(90)
+
+    elif col == "Remarks":
+        col_widths.append(80)
+
+    else:
+        col_widths.append(70)
     
     table = Table(
         table_data,
