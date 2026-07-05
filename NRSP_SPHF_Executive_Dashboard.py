@@ -842,7 +842,7 @@ pdf = create_pending_pdf(
 
 st.download_button(
     label="📄 Download PDF Report",
-    data=pdf_file,
+    data=pdf,
     file_name=f"{selected_bank}_{installment}_Pending_List.pdf",
     mime="application/pdf"
 )
