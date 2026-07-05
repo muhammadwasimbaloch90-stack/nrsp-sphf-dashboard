@@ -172,10 +172,7 @@ def create_pending_pdf(df_report, bank, installment):
     table_data = [available_columns]
     table_data += df_report.fillna("").values.tolist()
 
-    table_data = [available_columns]
-    table_data += df_report.fillna("").values.tolist()
-
-    col_widths = []
+col_widths = []
 
 for col in available_columns:
 
