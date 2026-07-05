@@ -817,20 +817,27 @@ download_cols = [
     "Beneficiary Name",
     "Father/Husband Name",
     "Mobile Number",
-    "Gender",
     "CNIC No.",
     "District",
     "Tehsil",
     "UC",
-    "Village"
+    "Village",
+    "Account No.",
+    "Bank"
 ]
 
-pending_download = pending_df[download_cols]
+pending_download = pending_df[download_cols].copy()
 
-pdf_file = create_pending_pdf(
+# Village A-Z
+pending_download = pending_download.sort_values(
+    by="Village",
+    ascending=True
+)
+
+pdf = create_pending_pdf(
     pending_download,
     selected_bank,
-    installment
+    f"{installment} Pending Withdrawal"
 )
 
 st.download_button(
