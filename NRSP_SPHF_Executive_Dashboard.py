@@ -281,6 +281,296 @@ def create_pending_pdf(df_report, bank, installment):
     buffer.close()
 
     return pdf
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.units import inch
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.graphics.shapes import Drawing, Line
+import datetime
+
+try:
+    pdfmetrics.registerFont(TTFont("Calibri", "calibri.ttf"))
+    FONT = "Calibri"
+except:
+    FONT = "Helvetica"
+
+
+def create_completion_certificate_pdf(beneficiary):
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=25,
+        rightMargin=25,
+        topMargin=20,
+        bottomMargin=20
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = styles["Title"]
+    title_style.fontName = FONT
+    title_style.alignment = TA_CENTER
+    title_style.fontSize = 24
+    title_style.leading = 30
+
+    normal = styles["Normal"]
+    normal.fontName = FONT
+    normal.fontSize = 14
+    normal.leading = 24
+
+    elements = []
+
+    # ==========================
+    # LOGOS
+    # ==========================
+
+    try:
+
+        govt = Image(
+            "Govt_Balochistan.png",
+            width=90,
+            height=90
+        )
+
+    except:
+        govt = ""
+
+    try:
+
+        sphf = Image(
+            "SPHF_Logo.png",
+            width=90,
+            height=90
+        )
+
+    except:
+        sphf = ""
+
+    try:
+
+        nrsp = Image(
+            "NRSP_Logo.png",
+            width=90,
+            height=90
+        )
+
+    except:
+        nrsp = ""
+
+    logo_table = Table(
+        [[govt, sphf, nrsp]],
+        colWidths=[220,220,220]
+    )
+
+    logo_table.setStyle(
+        TableStyle([
+            ("ALIGN",(0,0),(0,0),"LEFT"),
+            ("ALIGN",(1,0),(1,0),"CENTER"),
+            ("ALIGN",(2,0),(2,0),"RIGHT"),
+            ("VALIGN",(0,0),(-1,-1),"MIDDLE")
+        ])
+    )
+
+    elements.append(logo_table)
+    elements.append(Spacer(1,20))
+
+    # ==========================
+    # TITLE
+    # ==========================
+
+    elements.append(
+        Paragraph(
+            "HOUSE COMPLETION CERTIFICATE",
+            title_style
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "Sindh People's Housing for Flood Affectees (SPHF)",
+            styles["Heading2"]
+        )
+    )
+
+    elements.append(Spacer(1,25))
+
+    # ==========================
+    # CERTIFICATE TEXT
+    # ==========================
+
+    certificate_text = f"""
+    This is to certify that <b>{beneficiary['Beneficiary Name']}</b>,
+    Son / Daughter / Wife of
+    <b>{beneficiary['Father/Husband Name']}</b>,
+    bearing CNIC No.
+    <b>{beneficiary['CNIC No.']}</b>,
+    resident of
+    <b>{beneficiary['Village']}</b>,
+    Union Council
+    <b>{beneficiary['UC']}</b>,
+    Tehsil
+    <b>{beneficiary['Tehsil']}</b>,
+    District
+    <b>{beneficiary['District']}</b>,
+    has successfully completed the reconstruction of a flood resilient
+    house under the Sindh People's Housing for Flood Affectees (SPHF)
+    Project implemented by NRSP in collaboration with the Government
+    of Balochistan.
+
+    The construction has been completed in accordance with the approved
+    technical standards and project guidelines.
+    """
+
+    elements.append(
+        Paragraph(
+            certificate_text,
+            normal
+        )
+    )
+
+    elements.append(Spacer(1,30))
+
+    # ==========================
+    # BENEFICIARY INFORMATION
+    # ==========================
+
+    info_data = [
+
+        ["UUID", beneficiary["UUID"]],
+
+        ["Beneficiary Name",
+         beneficiary["Beneficiary Name"]],
+
+        ["Father / Husband",
+         beneficiary["Father/Husband Name"]],
+
+        ["CNIC",
+         beneficiary["CNIC No."]],
+
+        ["Village",
+         beneficiary["Village"]],
+
+        ["UC",
+         beneficiary["UC"]],
+
+        ["Tehsil",
+         beneficiary["Tehsil"]],
+
+        ["District",
+         beneficiary["District"]]
+
+    ]
+
+    info_table = Table(
+        info_data,
+        colWidths=[180,420]
+    )
+
+    info_table.setStyle(
+
+        TableStyle([
+
+            ("GRID",(0,0),(-1,-1),0.5,colors.black),
+
+            ("BACKGROUND",(0,0),(0,-1),
+             colors.HexColor("#EAF4EA")),
+
+            ("FONTNAME",(0,0),(-1,-1),FONT),
+
+            ("FONTSIZE",(0,0),(-1,-1),12),
+
+            ("BOTTOMPADDING",(0,0),(-1,-1),8),
+
+            ("TOPPADDING",(0,0),(-1,-1),8),
+
+            ("VALIGN",(0,0),(-1,-1),"MIDDLE")
+
+        ])
+
+    )
+
+    elements.append(info_table)
+
+    elements.append(Spacer(1,35))
+
+    # ==========================
+    # SIGNATURES
+    # ==========================
+
+    sign_table = Table(
+        [[
+            "____________________\nBeneficiary",
+
+            "____________________\nEngineer",
+
+            "____________________\nMIS-M&E Officer",
+
+            "____________________\nDistrict Manager"
+        ]],
+        colWidths=[160,160,160,160]
+    )
+
+    sign_table.setStyle(
+        TableStyle([
+
+            ("ALIGN",(0,0),(-1,-1),"CENTER"),
+            ("VALIGN",(0,0),(-1,-1),"BOTTOM"),
+            ("TOPPADDING",(0,0),(-1,-1),25),
+            ("BOTTOMPADDING",(0,0),(-1,-1),10),
+            ("FONTNAME",(0,0),(-1,-1),FONT),
+            ("FONTSIZE",(0,0),(-1,-1),12)
+
+        ])
+    )
+
+    elements.append(sign_table)
+
+    elements.append(Spacer(1,25))
+
+    # ==========================
+    # ISSUE DATE
+    # ==========================
+
+    issue_date = datetime.datetime.now().strftime("%d-%m-%Y")
+
+    elements.append(
+        Paragraph(
+            f"<b>Date of Issue :</b> {issue_date}",
+            normal
+        )
+    )
+
+    elements.append(Spacer(1,20))
+
+    # ==========================
+    # FOOTER
+    # ==========================
+
+    elements.append(
+        Paragraph(
+            "<para align='center'><font size='10'>"
+            "Generated from NRSP SPHF MIS Dashboard"
+            "<br/>Designed & Developed by <b>Waseem Baloch</b>"
+            "</font></para>",
+            styles["Normal"]
+        )
+    )
+
+    # ==========================
+    # BUILD PDF
+    # ==========================
+
+    doc.build(elements)
+
+    pdf = buffer.getvalue()
+
+    buffer.close()
+
+    return pdf
     
 df = load_data()
 
@@ -1034,6 +1324,125 @@ else:
         "text/csv"
     )
 
+# =========================
+# COMPLETION CERTIFICATES
+# =========================
+
+st.subheader("🏆 House Completion Certificates")
+
+st.info(
+    "Generate professional completion certificates for completed SPHF beneficiaries."
+)
+
+certificate_uuid = st.text_input(
+    "Enter Beneficiary UUID",
+    key="certificate_uuid"
+).strip()
+
+generate_certificate = st.button(
+    "Generate Completion Certificate",
+    key="generate_certificate"
+)
+
+if generate_certificate:
+
+    if certificate_uuid == "":
+
+        st.warning("Please enter Beneficiary UUID.")
+
+    else:
+
+        beneficiary = df[
+            df["UUID"].astype(str).str.strip() == certificate_uuid
+        ]
+
+        if beneficiary.empty:
+
+            st.error("❌ No beneficiary found for this UUID.")
+
+        else:
+
+            beneficiary = beneficiary.iloc[0]
+
+            # Check Completion Status
+            completion = str(
+                beneficiary["Completion Yes/No"]
+            ).strip().upper()
+
+            if completion != "YES":
+
+                st.warning(
+                    "⚠️ This beneficiary has not completed the house yet. Certificate cannot be generated."
+                )
+
+            else:
+
+                st.success(
+                    f"Certificate Loaded Successfully for {beneficiary['Beneficiary Name']}"
+                )                
+                st.markdown("---")
+                st.markdown("---")
+
+                col1, col2, col3 = st.columns([1,1,1])
+
+                with col1:
+                    st.image("Govt_Balochistan.png", width=100)
+
+                with col2:
+                    st.image("SPHF_Logo.png", width=100)
+
+                with col3:
+                    st.image("NRSP_Logo.png", width=100)
+
+                st.markdown(
+                    "<h1 style='text-align:center;color:#006400;'>HOUSE COMPLETION CERTIFICATE</h1>",
+                        unsafe_allow_html=True,
+                )
+
+                st.markdown(
+                    "<h3 style='text-align:center;'>Sindh People's Housing for Flood Affectees (SPHF)</h3>",
+                        unsafe_allow_html=True,
+                )
+
+                st.divider()
+
+                st.write("### Beneficiary Information")
+
+                st.table({
+                    "Field": [
+                        "UUID",
+                        "Beneficiary Name",
+                        "Father / Husband",
+                        "CNIC",
+                        "Village",
+                        "UC",
+                        "Tehsil",
+                        "District"
+                ],
+                "Value": [
+                    beneficiary["UUID"],
+                    beneficiary["Beneficiary Name"],
+                    beneficiary["Father/Husband Name"],
+                    beneficiary["CNIC No."],
+                    beneficiary["Village"],
+                    beneficiary["UC"],
+                    beneficiary["Tehsil"],
+                    beneficiary["District"]
+                ]
+            })
+
+                pdf_certificate = create_completion_certificate_pdf(
+                    beneficiary
+                )
+
+                st.download_button(
+                    label="📄 Download Official Completion Certificate",
+                    data=pdf_certificate,
+                    file_name=f"Completion_Certificate_{beneficiary['UUID']}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+            
 # =========================
 # SEARCH
 # =========================
