@@ -319,7 +319,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     normal = styles["Normal"]
     normal.fontName = FONT
-    normal.fontSize = 14
+    normal.fontSize = 10
     normal.leading = 24
 
     elements = []
@@ -332,7 +332,7 @@ def create_completion_certificate_pdf(beneficiary):
 
         govt = Image(
             "Govt_Balochistan.png",
-            width=60,
+            width=65,
             height=60
         )
 
@@ -343,7 +343,7 @@ def create_completion_certificate_pdf(beneficiary):
 
         sphf = Image(
             "SPHF Logo.png",
-            width=60,
+            width=70,
             height=60
         )
 
@@ -354,7 +354,7 @@ def create_completion_certificate_pdf(beneficiary):
 
         nrsp = Image(
             "NRSP-Logo.png",
-            width=75,
+            width=80,
             height=45
         )
 
@@ -519,7 +519,7 @@ def create_completion_certificate_pdf(beneficiary):
 
             ("ALIGN",(0,0),(-1,-1),"CENTER"),
             ("VALIGN",(0,0),(-1,-1),"BOTTOM"),
-            ("TOPPADDING",(0,0),(-1,-1),25),
+            ("TOPPADDING",(0,0),(-1,-1),12),
             ("BOTTOMPADDING",(0,0),(-1,-1),10),
             ("FONTNAME",(0,0),(-1,-1),FONT),
             ("FONTSIZE",(0,0),(-1,-1),12)
