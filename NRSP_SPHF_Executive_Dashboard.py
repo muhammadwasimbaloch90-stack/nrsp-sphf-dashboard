@@ -15,7 +15,9 @@ from reportlab.platypus import (
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.pagesizes import A4, landscape, portrait
+
+st.set_page_config(
 
 st.set_page_config(
     page_title="NRSP SPHF MIS Dashboard",
@@ -1392,7 +1394,7 @@ if generate_certificate:
                     st.image("SPHF_Logo.png", width=100)
 
                 with col3:
-                    st.image("NRSP_Logo.png", width=100)
+                    st.image("NRSP-Logo.png", width=100)
 
                 st.markdown(
                     "<h1 style='text-align:center;color:#006400;'>HOUSE COMPLETION CERTIFICATE</h1>",
