@@ -302,7 +302,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=landscape(A4),
+        pagesize=portrait(A4),
         leftMargin=25,
         rightMargin=25,
         topMargin=20,
@@ -332,8 +332,8 @@ def create_completion_certificate_pdf(beneficiary):
 
         govt = Image(
             "Govt_Balochistan.png",
-            width=90,
-            height=90
+            width=80,
+            height=80
         )
 
     except:
@@ -342,9 +342,9 @@ def create_completion_certificate_pdf(beneficiary):
     try:
 
         sphf = Image(
-            "SPHF_Logo.png",
-            width=90,
-            height=90
+            "SPHF Logo.png",
+            width=80,
+            height=80
         )
 
     except:
@@ -353,9 +353,9 @@ def create_completion_certificate_pdf(beneficiary):
     try:
 
         nrsp = Image(
-            "NRSP_Logo.png",
+            "NRSP-Logo.png",
             width=90,
-            height=90
+            height=50
         )
 
     except:
