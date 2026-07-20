@@ -332,8 +332,8 @@ def create_completion_certificate_pdf(beneficiary):
 
         govt = Image(
             "Govt_Balochistan.png",
-            width=80,
-            height=80
+            width=60,
+            height=60
         )
 
     except:
@@ -343,8 +343,8 @@ def create_completion_certificate_pdf(beneficiary):
 
         sphf = Image(
             "SPHF Logo.png",
-            width=80,
-            height=80
+            width=60,
+            height=60
         )
 
     except:
@@ -354,8 +354,8 @@ def create_completion_certificate_pdf(beneficiary):
 
         nrsp = Image(
             "NRSP-Logo.png",
-            width=90,
-            height=50
+            width=75,
+            height=45
         )
 
     except:
@@ -363,7 +363,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     logo_table = Table(
         [[govt, sphf, nrsp]],
-        colWidths=[220,220,220]
+        colWidths=[170,170,170]
     )
 
     logo_table.setStyle(
@@ -396,7 +396,7 @@ def create_completion_certificate_pdf(beneficiary):
         )
     )
 
-    elements.append(Spacer(1,25))
+    elements.append(Spacer(1,15))
 
     # ==========================
     # CERTIFICATE TEXT
@@ -432,7 +432,7 @@ def create_completion_certificate_pdf(beneficiary):
         )
     )
 
-    elements.append(Spacer(1,30))
+    elements.append(Spacer(1,15))
 
     # ==========================
     # BENEFICIARY INFORMATION
@@ -467,7 +467,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     info_table = Table(
         info_data,
-        colWidths=[180,420]
+        colWidths=[150,330]
     )
 
     info_table.setStyle(
@@ -495,7 +495,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     elements.append(info_table)
 
-    elements.append(Spacer(1,35))
+    elements.append(Spacer(1,15))
 
     # ==========================
     # SIGNATURES
@@ -511,7 +511,7 @@ def create_completion_certificate_pdf(beneficiary):
 
             "____________________\nDistrict Manager"
         ]],
-        colWidths=[160,160,160,160]
+        colWidths=[120,120,120,120]
     )
 
     sign_table.setStyle(
@@ -529,7 +529,7 @@ def create_completion_certificate_pdf(beneficiary):
 
     elements.append(sign_table)
 
-    elements.append(Spacer(1,25))
+    elements.append(Spacer(1,15))
 
     # ==========================
     # ISSUE DATE
