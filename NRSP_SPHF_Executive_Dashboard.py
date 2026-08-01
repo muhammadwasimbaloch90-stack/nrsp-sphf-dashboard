@@ -181,130 +181,331 @@ if not st.session_state.logged_in:
 # GLOBAL DASHBOARD STYLING
 # =========================
 
+import html as _html_lib
+
 st.markdown(
     """
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
 
     #MainMenu, footer {visibility: hidden;}
 
+    html, body, [class*="css"], .stMarkdown, .stText, p, span, div, li {
+        font-family: 'Inter', 'Segoe UI', sans-serif !important;
+    }
+
+    h1, h2, h3, h4, h5, .nrsp-section, .nrsp-title, .kpi-value {
+        font-family: 'Poppins', 'Segoe UI', sans-serif !important;
+    }
+
     .stApp {
-        background: linear-gradient(180deg, #f4faf6 0%, #eef6f1 100%);
+        background:
+            radial-gradient(circle at 8% 0%, #eafaf1 0%, transparent 45%),
+            radial-gradient(circle at 95% 12%, #eaf3fb 0%, transparent 40%),
+            linear-gradient(180deg, #f6faf8 0%, #eef3f0 100%);
     }
 
-    /* Sidebar */
+    /* ============ SIDEBAR ============ */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #063d1e 0%, #0b6e4f 100%);
+        background: linear-gradient(200deg, #063d1e 0%, #0b6e4f 60%, #0e8a63 100%);
+        border-right: none;
     }
-    section[data-testid="stSidebar"] * {
-        color: #f2fbf5 !important;
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] p {
+        color: #eafaf1 !important;
+        font-weight: 600 !important;
     }
-    section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] {
-        background-color: rgba(255,255,255,0.12);
-        border-radius: 10px;
+    /* Force the select control itself to always have a light, readable surface
+       (fixes previously invisible white-on-white text in the sidebar) */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border-radius: 10px !important;
+        border: none !important;
+    }
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * {
+        color: #0b3d21 !important;
+        font-weight: 600 !important;
+    }
+    .sidebar-brand {
+        text-align: center;
+        padding: 6px 0 18px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.18);
+        margin-bottom: 18px;
+    }
+    .sidebar-brand h3 {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        margin: 8px 0 0 0;
+        letter-spacing: 0.5px;
+    }
+    .sidebar-brand p {
+        color: #bfe8d3 !important;
+        font-size: 12.5px !important;
+        margin: 2px 0 0 0 !important;
     }
 
-    /* Top banner */
+    /* ============ TOP BANNER ============ */
     .nrsp-banner {
-        background: linear-gradient(120deg, #ffffff 0%, #eafaf1 100%);
-        border-radius: 20px;
-        padding: 18px 25px;
-        box-shadow: 0px 8px 25px rgba(0,80,0,0.08);
+        background: linear-gradient(120deg, #ffffff 0%, #eafaf4 100%);
+        border-radius: 22px;
+        padding: 24px 30px;
+        box-shadow: 0px 12px 34px rgba(0,80,40,0.10);
         border: 1px solid #e2efe6;
-        margin-bottom: 10px;
+        margin-bottom: 22px;
+        position: relative;
+        overflow: hidden;
+    }
+    .nrsp-banner::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #0b6e4f, #1e88e5, #8e24aa, #ef6c00);
+    }
+    .nrsp-title {
+        text-align: center;
+        color: #08341e;
+        font-weight: 800;
+        font-size: 32px;
+        margin-bottom: 4px;
+        letter-spacing: 0.3px;
+        line-height: 1.3;
+    }
+    .nrsp-subtitle {
+        text-align: center;
+        font-size: 15.5px;
+        color: #5c6f61;
+        font-weight: 500;
+        letter-spacing: 0.3px;
     }
 
-    /* Section headers */
+    /* ============ HERO KPI CARDS ============ */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 8px;
+    }
+    .kpi-card {
+        border-radius: 18px;
+        padding: 22px 20px;
+        color: #ffffff;
+        box-shadow: 0px 12px 30px rgba(0,0,0,0.12);
+        position: relative;
+        overflow: hidden;
+        transition: 0.25s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 18px 38px rgba(0,0,0,0.18);
+    }
+    .kpi-card::after {
+        content: "";
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.12);
+    }
+    .kpi-icon { font-size: 26px; margin-bottom: 6px; }
+    .kpi-value {
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 2px;
+    }
+    .kpi-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        opacity: 0.92;
+        letter-spacing: 0.3px;
+    }
+
+    /* ============ SECTION HEADERS ============ */
+    .nrsp-section-wrap {
+        margin: 30px 0 16px 0;
+    }
     .nrsp-section {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 18px;
-        border-radius: 12px;
-        margin: 22px 0 14px 0;
+        gap: 12px;
+        padding: 13px 22px;
+        border-radius: 14px;
         font-size: 20px;
         font-weight: 700;
         color: #ffffff;
-        box-shadow: 0px 6px 16px rgba(0,0,0,0.10);
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.12);
+        letter-spacing: 0.2px;
+    }
+    .nrsp-section .badge-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.85);
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
     }
 
-    /* Metrics as colorful cards */
+    /* ============ METRIC CARDS ============ */
     div[data-testid="stMetric"] {
         background: #ffffff;
         border-radius: 16px;
-        padding: 14px 10px 10px 10px;
+        padding: 16px 14px 14px 14px;
         border: 1px solid #e6efe9;
-        border-left: 6px solid #0b6e4f;
-        box-shadow: 0px 6px 18px rgba(0,60,30,0.08);
+        border-top: 5px solid #0b6e4f;
+        box-shadow: 0px 8px 22px rgba(0,60,30,0.08);
         transition: 0.2s ease;
+        text-align: center;
     }
     div[data-testid="stMetric"]:hover {
-        transform: translateY(-3px);
-        box-shadow: 0px 10px 26px rgba(0,60,30,0.14);
+        transform: translateY(-4px);
+        box-shadow: 0px 14px 30px rgba(0,60,30,0.16);
     }
     div[data-testid="stMetricLabel"] {
-        color: #4a5a4c !important;
+        color: #55665a !important;
         font-weight: 600 !important;
+        justify-content: center !important;
+        font-size: 13.5px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
     div[data-testid="stMetricValue"] {
-        color: #0b3d21 !important;
+        color: #08341e !important;
         font-weight: 800 !important;
+        font-size: 30px !important;
+        justify-content: center !important;
     }
 
-    /* Buttons */
+    /* ============ BUTTONS ============ */
     .stButton>button {
-        background: linear-gradient(135deg, #0b6e4f, #063d1e);
+        background: linear-gradient(135deg, #0e8a63, #063d1e);
         color: white;
         border-radius: 10px;
         border: none;
         font-weight: 600;
-        padding: 8px 18px;
+        padding: 9px 20px;
+        letter-spacing: 0.3px;
         transition: 0.2s ease;
     }
     .stButton>button:hover {
         transform: translateY(-1px);
-        box-shadow: 0px 6px 16px rgba(0,60,30,0.25);
+        box-shadow: 0px 8px 20px rgba(0,60,30,0.28);
     }
 
-    /* Download buttons */
     .stDownloadButton>button {
-        background: linear-gradient(135deg, #1e88e5, #0d47a1);
+        background: linear-gradient(135deg, #2196f3, #0d47a1);
         color: white;
         border-radius: 10px;
         border: none;
         font-weight: 600;
-        padding: 8px 18px;
+        padding: 9px 20px;
+        letter-spacing: 0.3px;
         transition: 0.2s ease;
     }
     .stDownloadButton>button:hover {
         transform: translateY(-1px);
-        box-shadow: 0px 6px 16px rgba(13,71,161,0.28);
+        box-shadow: 0px 8px 20px rgba(13,71,161,0.30);
     }
 
-    /* DataFrames */
+    /* ============ DATAFRAMES (raw / large tables) ============ */
     div[data-testid="stDataFrame"] {
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid #e2efe6;
-        box-shadow: 0px 6px 18px rgba(0,0,0,0.06);
+        box-shadow: 0px 8px 22px rgba(0,0,0,0.06);
     }
 
-    /* Inputs / Selectboxes */
-    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
+    /* ============ CUSTOM STYLED TABLES ============ */
+    .nrsp-table-wrap {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0px 10px 26px rgba(0,40,20,0.10);
+        border: 1px solid #e2efe6;
+        margin-bottom: 6px;
+    }
+    table.nrsp-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    table.nrsp-table thead tr {
+        background: linear-gradient(120deg, #0b6e4f, #0e8a63 55%, #1565c0);
+    }
+    table.nrsp-table thead th {
+        color: #ffffff !important;
+        font-weight: 700;
+        padding: 13px 12px;
+        text-align: center;
+        white-space: nowrap;
+        letter-spacing: 0.2px;
+    }
+    table.nrsp-table tbody td {
+        padding: 11px 12px;
+        text-align: center;
+        color: #2b3a30;
+        border-bottom: 1px solid #eef3ef;
+    }
+    table.nrsp-table tbody tr:nth-child(even) {
+        background-color: #f6faf7;
+    }
+    table.nrsp-table tbody tr:hover {
+        background-color: #eaf6ef;
+        transition: 0.15s ease;
+    }
+    table.nrsp-table td.cell-pending {
+        color: #c62828;
+        font-weight: 700;
+    }
+    table.nrsp-table td.cell-done {
+        color: #0b6e4f;
+        font-weight: 700;
+    }
+
+    /* ============ INPUTS / SELECTBOXES (main area) ============ */
+    .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {
         border-radius: 10px !important;
     }
+    .stTextInput input:focus {
+        border-color: #0b6e4f !important;
+        box-shadow: 0 0 0 3px rgba(11,110,79,0.15) !important;
+    }
 
-    /* Alert boxes */
+    /* ============ ALERT BOXES ============ */
     div[data-testid="stAlert"] {
         border-radius: 12px;
+        font-weight: 500;
     }
 
     hr {
         border: none;
         border-top: 2px solid #d9ece1;
-        margin: 25px 0;
+        margin: 28px 0;
+    }
+
+    /* Plotly chart container */
+    div[data-testid="stPlotlyChart"] {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 10px;
+        box-shadow: 0px 8px 22px rgba(0,0,0,0.06);
+        border: 1px solid #e2efe6;
     }
 
     </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.markdown(
+    """
+    <div class="sidebar-brand">
+        <h3>NRSP · SPHF MIS</h3>
+        <p>Flood Reconstruction Monitoring</p>
+    </div>
     """,
     unsafe_allow_html=True
 )
@@ -323,12 +524,58 @@ def section_header(title):
     _section_state["i"] += 1
     st.markdown(
         f"""
-        <div class="nrsp-section" style="background: linear-gradient(120deg, {color}, {color}cc);">
-            {title}
+        <div class="nrsp-section-wrap">
+            <div class="nrsp-section" style="background: linear-gradient(120deg, {color}, {color}cc);">
+                <span class="badge-dot"></span>{title}
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+
+def render_table(df):
+    """Render a compact summary DataFrame as a polished, presentation-quality HTML table."""
+
+    if df is None or df.empty:
+        st.info("No data available.")
+        return
+
+    headers = df.columns.tolist()
+
+    rows_html = ""
+    for _, row in df.iterrows():
+        cells_html = ""
+        for h in headers:
+            val = row[h]
+            col_lower = str(h).lower()
+            cell_class = ""
+
+            if isinstance(val, (int, float)) and not isinstance(val, bool):
+                if "pending" in col_lower and float(val) > 0:
+                    cell_class = "cell-pending"
+                elif ("done" in col_lower or "verified" in col_lower or "disbursed" in col_lower) and float(val) > 0:
+                    cell_class = "cell-done"
+                display_val = f"{val:,.0f}" if float(val) == int(val) else f"{val:,.2f}"
+            else:
+                display_val = _html_lib.escape(str(val)) if pd.notna(val) else ""
+
+            cells_html += f'<td class="{cell_class}">{display_val}</td>'
+
+        rows_html += f"<tr>{cells_html}</tr>"
+
+    header_html = "".join(f"<th>{_html_lib.escape(str(h))}</th>" for h in headers)
+
+    table_html = f"""
+    <div class="nrsp-table-wrap">
+        <table class="nrsp-table">
+            <thead><tr>{header_html}</tr></thead>
+            <tbody>{rows_html}</tbody>
+        </table>
+    </div>
+    """
+
+    st.markdown(table_html, unsafe_allow_html=True)
 
 
 # =========================
@@ -908,28 +1155,35 @@ if missing_columns:
 # HEADER WITH LOGOS
 # =========================
 
+st.markdown(
+    """
+    <style>
+    .nrsp-banner [data-testid="stHorizontalBlock"] {
+        align-items: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.markdown('<div class="nrsp-banner">', unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns([1,3,1])
+col1, col2, col3 = st.columns([1, 3, 1])
 
 with col1:
-    st.image(NRSP_LOGO, width=110)
+    st.image(NRSP_LOGO, width=105)
 
 with col2:
     st.markdown(
         """
-        <h1 style='text-align:center;color:#0b6e4f;margin-bottom:0;'>
-        NRSP - SPHF Flood Reconstruction MIS
-        </h1>
-        <div style='text-align:center;font-size:17px;color:#4a5a4c;'>
-        Govt: Of Balochistan | SPHF Project | NRSP
-        </div>
+        <div class="nrsp-title">NRSP – SPHF Flood Reconstruction MIS</div>
+        <div class="nrsp-subtitle">Government of Balochistan &nbsp;•&nbsp; SPHF Project &nbsp;•&nbsp; National Rural Support Programme</div>
         """,
         unsafe_allow_html=True
     )
 
 with col3:
-    st.image(SPHF_LOGO, width=110)
+    st.image(SPHF_LOGO, width=105)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1054,6 +1308,40 @@ sp4 = yes_count(df[SPHF4])
 
 total_disbursed = sp1 + sp2 + sp3 + sp4
 
+total_beneficiaries = len(df)
+completion_verified = yes_count(df[COMP])
+completion_pct = round(
+    (completion_verified / total_beneficiaries) * 100, 1
+) if total_beneficiaries > 0 else 0
+
+st.markdown(
+    f"""
+    <div class="kpi-grid">
+        <div class="kpi-card" style="background:linear-gradient(135deg,#0b6e4f,#063d1e);">
+            <div class="kpi-icon">👨‍👩‍👧‍👦</div>
+            <div class="kpi-value">{total_beneficiaries:,}</div>
+            <div class="kpi-label">TOTAL BENEFICIARIES</div>
+        </div>
+        <div class="kpi-card" style="background:linear-gradient(135deg,#1565c0,#0d3b73);">
+            <div class="kpi-icon">🏦</div>
+            <div class="kpi-value">{total_disbursed:,}</div>
+            <div class="kpi-label">TOTAL DISBURSEMENTS</div>
+        </div>
+        <div class="kpi-card" style="background:linear-gradient(135deg,#ef6c00,#a24800);">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-value">{total_pending:,}</div>
+            <div class="kpi-label">WITHDRAWALS PENDING</div>
+        </div>
+        <div class="kpi-card" style="background:linear-gradient(135deg,#8e24aa,#4a148c);">
+            <div class="kpi-icon">🏆</div>
+            <div class="kpi-value">{completion_pct}%</div>
+            <div class="kpi-label">HOUSES COMPLETED</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 section_header("🏦 SPHF Disbursement Overview")
 
 r1c1, r1c2, r1c3, r1c4, r1c5 = st.columns(5)
@@ -1117,7 +1405,7 @@ inst_df = pd.DataFrame({
     "Pending": [p1, p2, p3, p4]
 })
 
-st.dataframe(inst_df, use_container_width=True)
+render_table(inst_df)
 
 fig1 = px.bar(
     inst_df,
@@ -1175,10 +1463,7 @@ for bank, g in df.groupby(BANK):
 
 bank_detail_df = pd.DataFrame(bank_rows)
 
-st.dataframe(
-    bank_detail_df,
-    use_container_width=True
-)
+render_table(bank_detail_df)
 
 # Download Button
 
@@ -1224,10 +1509,7 @@ for bank, g in df.groupby(BANK):
 
 bank_pending_df = pd.DataFrame(pending_rows)
 
-st.dataframe(
-    bank_pending_df,
-    use_container_width=True
-)
+render_table(bank_pending_df)
 
 csv_pending = bank_pending_df.to_csv(index=False).encode("utf-8")
 
@@ -1261,10 +1543,7 @@ for district, g in df.groupby(DISTRICT):
 
 dist_done_df = pd.DataFrame(dist_done_rows)
 
-st.dataframe(
-    dist_done_df,
-    use_container_width=True
-)
+render_table(dist_done_df)
 
 csv_done = dist_done_df.to_csv(index=False).encode("utf-8")
 
@@ -1305,10 +1584,7 @@ for district, g in df.groupby(DISTRICT):
 
 dist_pending_df = pd.DataFrame(dist_pending_rows)
 
-st.dataframe(
-    dist_pending_df,
-    use_container_width=True
-)
+render_table(dist_pending_df)
 
 csv_pending = dist_pending_df.to_csv(index=False).encode("utf-8")
 
