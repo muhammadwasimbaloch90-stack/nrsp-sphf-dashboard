@@ -24,6 +24,14 @@ st.set_page_config(
 )
 
 # =========================
+# LOGO FILE NAMES (kept consistent everywhere in this file)
+# =========================
+
+NRSP_LOGO = "NRSP_Logo.png"
+SPHF_LOGO = "SPHF_Logo.png"
+GOVT_LOGO = "Govt_Balochistan.png"
+
+# =========================
 # LOGIN SYSTEM
 # =========================
 
@@ -36,7 +44,7 @@ if not st.session_state.logged_in:
         """
         <style>
 
-        /* Hide default Streamlit padding/menu for a cleaner look */
+        /* Hide default Streamlit chrome for a cleaner login look */
         #MainMenu, header, footer {visibility: hidden;}
 
         .stApp {
@@ -68,7 +76,7 @@ if not st.session_state.logged_in:
             box-shadow: 0 0 0 3px rgba(0,100,0,0.12) !important;
         }
 
-        /* Only style the SUBMIT button — not the password eye icon */
+        /* Only style the SUBMIT button, never the password eye icon */
         div[data-testid="stFormSubmitButton"] button {
             background: linear-gradient(135deg, #007a00, #004d00);
             color: white !important;
@@ -131,13 +139,13 @@ if not st.session_state.logged_in:
     st.markdown("<br>", unsafe_allow_html=True)
 
     st.markdown('<div class="login-logo-box">', unsafe_allow_html=True)
-    lc1, lc2, lc3 = st.columns([1.4, 1, 1.4])
+    lc1, lc2, lc3 = st.columns([2, 1, 2])
     with lc2:
-        st.image("NRSP_Logo.png", use_container_width=True)
+        st.image(NRSP_LOGO, width=90)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="login-title">NRSP — SPHF MIS</div>', unsafe_allow_html=True)
-    st.markdown('<div class="login-subtitle">Flood Reconstruction Monitoring & Information System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-subtitle">Flood Reconstruction Monitoring &amp; Information System</div>', unsafe_allow_html=True)
 
     with st.form("login_form"):
 
@@ -168,6 +176,160 @@ if not st.session_state.logged_in:
     )
 
     st.stop()
+
+# =========================
+# GLOBAL DASHBOARD STYLING
+# =========================
+
+st.markdown(
+    """
+    <style>
+
+    #MainMenu, footer {visibility: hidden;}
+
+    .stApp {
+        background: linear-gradient(180deg, #f4faf6 0%, #eef6f1 100%);
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #063d1e 0%, #0b6e4f 100%);
+    }
+    section[data-testid="stSidebar"] * {
+        color: #f2fbf5 !important;
+    }
+    section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] {
+        background-color: rgba(255,255,255,0.12);
+        border-radius: 10px;
+    }
+
+    /* Top banner */
+    .nrsp-banner {
+        background: linear-gradient(120deg, #ffffff 0%, #eafaf1 100%);
+        border-radius: 20px;
+        padding: 18px 25px;
+        box-shadow: 0px 8px 25px rgba(0,80,0,0.08);
+        border: 1px solid #e2efe6;
+        margin-bottom: 10px;
+    }
+
+    /* Section headers */
+    .nrsp-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        margin: 22px 0 14px 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        box-shadow: 0px 6px 16px rgba(0,0,0,0.10);
+    }
+
+    /* Metrics as colorful cards */
+    div[data-testid="stMetric"] {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 14px 10px 10px 10px;
+        border: 1px solid #e6efe9;
+        border-left: 6px solid #0b6e4f;
+        box-shadow: 0px 6px 18px rgba(0,60,30,0.08);
+        transition: 0.2s ease;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0px 10px 26px rgba(0,60,30,0.14);
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #4a5a4c !important;
+        font-weight: 600 !important;
+    }
+    div[data-testid="stMetricValue"] {
+        color: #0b3d21 !important;
+        font-weight: 800 !important;
+    }
+
+    /* Buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, #0b6e4f, #063d1e);
+        color: white;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        padding: 8px 18px;
+        transition: 0.2s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0px 6px 16px rgba(0,60,30,0.25);
+    }
+
+    /* Download buttons */
+    .stDownloadButton>button {
+        background: linear-gradient(135deg, #1e88e5, #0d47a1);
+        color: white;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        padding: 8px 18px;
+        transition: 0.2s ease;
+    }
+    .stDownloadButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0px 6px 16px rgba(13,71,161,0.28);
+    }
+
+    /* DataFrames */
+    div[data-testid="stDataFrame"] {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2efe6;
+        box-shadow: 0px 6px 18px rgba(0,0,0,0.06);
+    }
+
+    /* Inputs / Selectboxes */
+    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
+        border-radius: 10px !important;
+    }
+
+    /* Alert boxes */
+    div[data-testid="stAlert"] {
+        border-radius: 12px;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid #d9ece1;
+        margin: 25px 0;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+_SECTION_PALETTE = [
+    "#0b6e4f", "#1565c0", "#8e24aa", "#ef6c00",
+    "#00897b", "#c62828", "#2c3e50", "#6a1b9a",
+    "#00695c", "#ad1457", "#37474f", "#4527a0"
+]
+_section_state = {"i": 0}
+
+
+def section_header(title):
+    """Render a colorful, professional section header (replaces st.subheader)."""
+    color = _SECTION_PALETTE[_section_state["i"] % len(_SECTION_PALETTE)]
+    _section_state["i"] += 1
+    st.markdown(
+        f"""
+        <div class="nrsp-section" style="background: linear-gradient(120deg, {color}, {color}cc);">
+            {title}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 # =========================
 # LOAD DATA
@@ -231,13 +393,13 @@ def create_pending_pdf(df_report, bank, installment):
 
     try:
         logo1 = Image(
-            "NRSP_Logo.png",
+            NRSP_LOGO,
             width=90,
             height=40
         )
 
         logo2 = Image(
-            "SPHF_Logo.png",
+            SPHF_LOGO,
             width=90,
             height=40
         )
@@ -404,9 +566,7 @@ def create_pending_pdf(df_report, bank, installment):
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.units import inch
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.graphics.shapes import Drawing, Line
 import datetime
 
 try:
@@ -451,7 +611,7 @@ def create_completion_certificate_pdf(beneficiary):
     try:
 
         govt = Image(
-            "Govt_Balochistan.png",
+            GOVT_LOGO,
             width=65,
             height=60
         )
@@ -462,7 +622,7 @@ def create_completion_certificate_pdf(beneficiary):
     try:
 
         sphf = Image(
-            "SPHF Logo.png",
+            SPHF_LOGO,
             width=70,
             height=60
         )
@@ -473,7 +633,7 @@ def create_completion_certificate_pdf(beneficiary):
     try:
 
         nrsp = Image(
-            "NRSP-Logo.png",
+            NRSP_LOGO,
             width=80,
             height=45
         )
@@ -730,6 +890,7 @@ required_columns = [
     "Tehsil",
     "UC",
     "Village",
+    "Account No.",
     "S. No."
 ]
 
@@ -747,18 +908,20 @@ if missing_columns:
 # HEADER WITH LOGOS
 # =========================
 
+st.markdown('<div class="nrsp-banner">', unsafe_allow_html=True)
+
 col1, col2, col3 = st.columns([1,3,1])
 
 with col1:
-    st.image("NRSP_Logo.png", width=120)
+    st.image(NRSP_LOGO, width=110)
 
 with col2:
     st.markdown(
         """
-        <h1 style='text-align:center;color:#006400;'>
+        <h1 style='text-align:center;color:#0b6e4f;margin-bottom:0;'>
         NRSP - SPHF Flood Reconstruction MIS
         </h1>
-        <div style='text-align:center;font-size:18px;'>
+        <div style='text-align:center;font-size:17px;color:#4a5a4c;'>
         Govt: Of Balochistan | SPHF Project | NRSP
         </div>
         """,
@@ -766,9 +929,9 @@ with col2:
     )
 
 with col3:
-    st.image("SPHF_Logo.png", width=120)
+    st.image(SPHF_LOGO, width=110)
 
-st.markdown("---")
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================
@@ -834,6 +997,8 @@ districts = ["All"] + sorted(
     .tolist()
 )
 
+st.sidebar.markdown("### 🏘️ Filters")
+
 selected_district = st.sidebar.selectbox(
     "District Filter",
     districts
@@ -879,7 +1044,7 @@ total_done = d1 + d2 + d3 + d4
 total_pending = p1 + p2 + p3 + p4
 
 # =========================
-# EXECUTIVE CARDS
+# SPHF DISBURSEMENT OVERVIEW
 # =========================
 
 sp1 = yes_count(df[SPHF1])
@@ -889,7 +1054,7 @@ sp4 = yes_count(df[SPHF4])
 
 total_disbursed = sp1 + sp2 + sp3 + sp4
 
-st.subheader("🏦 SPHF Disbursement Summary")
+section_header("🏦 SPHF Disbursement Overview")
 
 r1c1, r1c2, r1c3, r1c4, r1c5 = st.columns(5)
 
@@ -899,9 +1064,25 @@ r1c3.metric("3rd Disbursed", sp3)
 r1c4.metric("4th Disbursed", sp4)
 r1c5.metric("Total Disbursed", total_disbursed)
 
-st.divider()
+sp_df = pd.DataFrame({
+    "Installment":["1st","2nd","3rd","4th"],
+    "Disbursed":[sp1,sp2,sp3,sp4]
+})
 
-st.subheader("Overall Trenches Withdrawal Summary")
+st.plotly_chart(
+    px.bar(
+        sp_df,
+        x="Installment",
+        y="Disbursed",
+        title="SPHF Installment Disbursement",
+        color="Installment",
+        color_discrete_sequence=px.colors.qualitative.Bold,
+        text="Disbursed"
+    ),
+    use_container_width=True
+)
+
+section_header("💰 Overall Trenches Withdrawal Summary")
 
 r2c1, r2c2, r2c3 = st.columns(3)
 
@@ -914,9 +1095,7 @@ pending_pct = round(
 
 r2c3.metric("Pending %", f"{pending_pct}%")
 
-st.divider()
-
-st.subheader("🏗️ Verification Progress")
+section_header("🏗️ Verification Progress")
 
 r3c1, r3c2, r3c3, r3c4 = st.columns(4)
 
@@ -925,45 +1104,12 @@ r3c2.metric("Lintel Verified", yes_count(df[LINTEL]))
 r3c3.metric("Roof Verified", yes_count(df[ROOF]))
 r3c4.metric("Completion Verified", yes_count(df[COMP]))
 
-# =========================
-# SPHF DISBURSEMENT
-# =========================
-
-sp1 = yes_count(df[SPHF1])
-sp2 = yes_count(df[SPHF2])
-sp3 = yes_count(df[SPHF3])
-sp4 = yes_count(df[SPHF4])
-
-st.subheader("🏦 SPHF Disbursement Dashboard")
-
-a,b,c,d = st.columns(4)
-
-a.metric("1st Disbursed", sp1)
-b.metric("2nd Disbursed", sp2)
-c.metric("3rd Disbursed", sp3)
-d.metric("4th Disbursed", sp4)
-
-sp_df = pd.DataFrame({
-    "Installment":["1st","2nd","3rd","4th"],
-    "Disbursed":[sp1,sp2,sp3,sp4]
-})
-
-st.plotly_chart(
-    px.bar(
-        sp_df,
-        x="Installment",
-        y="Disbursed",
-        title="SPHF Installment Disbursement"
-    ),
-    use_container_width=True
-)
-
 
 # =========================
 # INSTALLMENT SUMMARY
 # =========================
 
-st.subheader("Installment Wise Withdrawal Summary")
+section_header("📊 Installment Wise Withdrawal Summary")
 
 inst_df = pd.DataFrame({
     "Installment": ["1st", "2nd", "3rd", "4th"],
@@ -978,7 +1124,8 @@ fig1 = px.bar(
     x="Installment",
     y=["Done", "Pending"],
     barmode="group",
-    title="Installment Wise Done vs Pending"
+    title="Installment Wise Done vs Pending",
+    color_discrete_sequence=["#0b6e4f", "#e67e22"]
 )
 
 st.plotly_chart(fig1, use_container_width=True)
@@ -988,42 +1135,42 @@ st.plotly_chart(fig1, use_container_width=True)
 # BANK WISE INSTALLMENT REPORT
 # =========================
 
-st.subheader("🏦 Bank Wise Installment Withdrawal Report")
+section_header("🏦 Bank Wise Installment Withdrawal Report")
 
 bank_rows = []
 
 for bank, g in df.groupby(BANK):
 
-    d1 = yes_count(g[WD1])
-    p1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
+    bd1 = yes_count(g[WD1])
+    bp1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
 
-    d2 = yes_count(g[WD2])
-    p2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
+    bd2 = yes_count(g[WD2])
+    bp2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
 
-    d3 = yes_count(g[WD3])
-    p3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
+    bd3 = yes_count(g[WD3])
+    bp3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
 
-    d4 = yes_count(g[WD4])
-    p4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
+    bd4 = yes_count(g[WD4])
+    bp4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
 
     bank_rows.append({
 
         "Bank": bank,
 
-        "1st Done": d1,
-        "1st Pending": p1,
+        "1st Done": bd1,
+        "1st Pending": bp1,
 
-        "2nd Done": d2,
-        "2nd Pending": p2,
+        "2nd Done": bd2,
+        "2nd Pending": bp2,
 
-        "3rd Done": d3,
-        "3rd Pending": p3,
+        "3rd Done": bd3,
+        "3rd Pending": bp3,
 
-        "4th Done": d4,
-        "4th Pending": p4,
+        "4th Done": bd4,
+        "4th Pending": bp4,
 
-        "Total Done": d1+d2+d3+d4,
-        "Total Pending": p1+p2+p3+p4
+        "Total Done": bd1+bd2+bd3+bd4,
+        "Total Pending": bp1+bp2+bp3+bp4
     })
 
 bank_detail_df = pd.DataFrame(bank_rows)
@@ -1048,30 +1195,30 @@ st.download_button(
 # BANK WISE WITHDRAWAL PENDING
 # =========================
 
-st.subheader("⏳ Bank Wise Withdrawal Pending")
+section_header("⏳ Bank Wise Withdrawal Pending")
 
 pending_rows = []
 
 for bank, g in df.groupby(BANK):
 
-    p1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
+    bp1 = (is_yes(g[SPHF1]) & ~is_yes(g[WD1])).sum()
 
-    p2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
+    bp2 = (is_yes(g[SPHF2]) & ~is_yes(g[WD2])).sum()
 
-    p3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
+    bp3 = (is_yes(g[SPHF3]) & ~is_yes(g[WD3])).sum()
 
-    p4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
+    bp4 = (is_yes(g[SPHF4]) & ~is_yes(g[WD4])).sum()
 
     pending_rows.append({
 
         "Bank": bank,
 
-        "1st Pending": p1,
-        "2nd Pending": p2,
-        "3rd Pending": p3,
-        "4th Pending": p4,
+        "1st Pending": bp1,
+        "2nd Pending": bp2,
+        "3rd Pending": bp3,
+        "4th Pending": bp4,
 
-        "Total Pending": p1 + p2 + p3 + p4
+        "Total Pending": bp1 + bp2 + bp3 + bp4
 
     })
 
@@ -1095,7 +1242,7 @@ st.download_button(
 # DISTRICT VERIFICATION
 # =========================
 
-st.subheader("✅ District Wise Verification Done")
+section_header("✅ District Wise Verification Done")
 
 dist_done_rows = []
 
@@ -1132,7 +1279,7 @@ st.download_button(
 # DISTRICT VERIFICATION PENDING
 # =========================
 
-st.subheader("⏳ District Wise Verification Pending")
+section_header("⏳ District Wise Verification Pending")
 
 dist_pending_rows = []
 
@@ -1177,7 +1324,7 @@ st.download_button(
 # PENDING WITHDRAWAL DOWNLOAD
 # =========================
 
-st.subheader("📥 Download Pending Withdrawal Beneficiary List")
+section_header("📥 Download Pending Withdrawal Beneficiary List")
 
 selected_bank = st.selectbox(
     "🏦 Select Bank",
@@ -1277,7 +1424,7 @@ st.download_button(
 # STAGE VERIFICATION PENDING DOWNLOAD
 # =========================
 
-st.subheader("🏗 Stage Verification Pending Download")
+section_header("🏗 Stage Verification Pending Download")
 
 stage = st.selectbox(
     "Select Stage",
@@ -1415,7 +1562,7 @@ st.download_button(
 # REMARKS
 # =========================
 
-st.subheader("📝 AH Remarks Cases")
+section_header("📝 AH Remarks Cases")
 
 remarks_df = df[
     df[REMARKS]
@@ -1448,7 +1595,7 @@ else:
 # COMPLETION CERTIFICATES
 # =========================
 
-st.subheader("🏆 House Completion Certificates")
+section_header("🏆 House Completion Certificates")
 
 st.info(
     "Generate professional completion certificates for completed SPHF beneficiaries."
@@ -1501,18 +1648,17 @@ if generate_certificate:
                     f"Certificate Loaded Successfully for {beneficiary['Beneficiary Name']}"
                 )                
                 st.markdown("---")
-                st.markdown("---")
 
                 col1, col2, col3 = st.columns([1,1,1])
 
                 with col1:
-                    st.image("Govt_Balochistan.png", width=100)
+                    st.image(GOVT_LOGO, width=100)
 
                 with col2:
-                    st.image("SPHF_Logo.png", width=100)
+                    st.image(SPHF_LOGO, width=100)
 
                 with col3:
-                    st.image("NRSP-Logo.png", width=100)
+                    st.image(NRSP_LOGO, width=100)
 
                 st.markdown(
                     "<h1 style='text-align:center;color:#006400;'>HOUSE COMPLETION CERTIFICATE</h1>",
@@ -1567,7 +1713,7 @@ if generate_certificate:
 # SEARCH
 # =========================
 
-st.subheader("🔍 Search Beneficiary")
+section_header("🔍 Search Beneficiary")
 
 search = st.text_input(
     "Enter UUID or CNIC"
@@ -1594,7 +1740,7 @@ if search:
 # PROJECT STAFF
 # =========================
 
-st.subheader("👥 NRSP Project Staff")
+section_header("👥 NRSP Project Staff")
 
 staff_df = load_staff()
 staff_df.columns = staff_df.columns.str.strip()
@@ -1611,12 +1757,13 @@ for i, (_, row) in enumerate(staff_df.iterrows()):
             f"""
             <div style="
                 border:1px solid #e0e0e0;
-                border-radius:15px;
-                padding:15px;
+                border-radius:16px;
+                padding:18px;
                 text-align:center;
-                box-shadow:0px 2px 10px rgba(0,0,0,0.08);
+                box-shadow:0px 6px 18px rgba(0,60,30,0.08);
                 margin-bottom:20px;
-                background-color:white;
+                background: linear-gradient(160deg, #ffffff, #f3fbf6);
+                border-top: 4px solid #0b6e4f;
             ">
             """,
             unsafe_allow_html=True
@@ -1629,12 +1776,12 @@ for i, (_, row) in enumerate(staff_df.iterrows()):
         ):
             try:
                 st.image(row["Pic URL"], width=150)
-            except:
+            except Exception:
                 pass
 
         st.markdown(
             f"""
-            <h4 style="color:#006400;">
+            <h4 style="color:#0b6e4f;margin-bottom:2px;">
                 {row['Name']}
             </h4>
 
@@ -1662,11 +1809,12 @@ st.markdown(
         text-align:center;
         color:#888888;
         font-size:13px;
-        opacity:0.6;
-        padding-top:20px;
+        opacity:0.75;
+        padding-top:10px;
         padding-bottom:10px;
     ">
-        Designed & Developed by Waseem Baloch
+        Designed &amp; Developed by <b>Waseem Baloch</b><br>
+        MIS – M&amp;E Officer, NRSP SPHF Project
     </div>
     """,
     unsafe_allow_html=True
