@@ -32,85 +32,140 @@ if "logged_in" not in st.session_state:
 
 if not st.session_state.logged_in:
 
-    # Custom CSS for login page
     st.markdown(
         """
         <style>
+
+        /* Hide default Streamlit padding/menu for a cleaner look */
+        #MainMenu, header, footer {visibility: hidden;}
+
         .stApp {
-            background: linear-gradient(135deg, #eafaf1 0%, #f4faf5 100%);
+            background: radial-gradient(circle at top left, #eafaf1 0%, #f6fbf7 45%, #eef6f0 100%);
         }
+
+        /* Login Card */
         div[data-testid="stForm"] {
-            background-color: white;
-            padding: 35px 40px;
-            border-radius: 20px;
-            box-shadow: 0px 8px 30px rgba(0,0,0,0.12);
-            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            padding: 40px 45px 30px 45px;
+            border-radius: 22px;
+            box-shadow: 0px 15px 45px rgba(0, 80, 0, 0.12);
+            border: 1px solid #e3ede4;
+            max-width: 420px;
+            margin: auto;
         }
-        div[data-testid="stForm"] button {
-            background-color: #006400;
-            color: white;
-            font-weight: bold;
+
+        /* Input fields */
+        div[data-testid="stForm"] input {
+            border-radius: 10px !important;
+            border: 1.5px solid #d7e5da !important;
+            padding: 10px 12px !important;
+            font-size: 15px !important;
+            background-color: #f9fbfa !important;
+        }
+
+        div[data-testid="stForm"] input:focus {
+            border: 1.5px solid #006400 !important;
+            box-shadow: 0 0 0 3px rgba(0,100,0,0.12) !important;
+        }
+
+        /* Only style the SUBMIT button — not the password eye icon */
+        div[data-testid="stFormSubmitButton"] button {
+            background: linear-gradient(135deg, #007a00, #004d00);
+            color: white !important;
+            font-weight: 600;
+            font-size: 16px;
             border-radius: 10px;
-            height: 45px;
+            height: 46px;
             width: 100%;
             border: none;
+            margin-top: 10px;
+            transition: 0.25s ease;
         }
-        div[data-testid="stForm"] button:hover {
-            background-color: #004d00;
-            color: white;
+
+        div[data-testid="stFormSubmitButton"] button:hover {
+            background: linear-gradient(135deg, #005c00, #003300);
+            transform: translateY(-1px);
+            box-shadow: 0px 6px 18px rgba(0,80,0,0.25);
         }
+
+        .login-logo-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .login-title {
+            text-align:center;
+            color:#004d00;
+            font-weight:800;
+            font-size:30px;
+            margin-bottom:2px;
+            letter-spacing: 0.5px;
+        }
+
+        .login-subtitle {
+            text-align:center;
+            color:#5a6b5d;
+            font-size:15px;
+            margin-bottom:25px;
+        }
+
+        .login-footer {
+            text-align:center;
+            color:#8a9a8c;
+            font-size:12.5px;
+            margin-top:18px;
+            line-height:1.6;
+        }
+
+        .login-footer b {
+            color:#4a5a4c;
+        }
+
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Center the login card
-    left, center, right = st.columns([1, 1.2, 1])
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    with center:
+    st.markdown('<div class="login-logo-box">', unsafe_allow_html=True)
+    lc1, lc2, lc3 = st.columns([1.4, 1, 1.4])
+    with lc2:
+        st.image("NRSP_Logo.png", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown('<div class="login-title">NRSP — SPHF MIS</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-subtitle">Flood Reconstruction Monitoring & Information System</div>', unsafe_allow_html=True)
 
-        c1, c2, c3 = st.columns([1, 2, 1])
-        with c2:
-            st.image("NRSP_Logo.png", width=100)
+    with st.form("login_form"):
 
-        st.markdown(
-            """
-            <h2 style='text-align:center; color:#006400; margin-bottom:0;'>
-                NRSP - SPHF MIS
-            </h2>
-            <p style='text-align:center; color:#666; margin-top:5px;'>
-                Please login to continue
-            </p>
-            """,
-            unsafe_allow_html=True
-        )
+        username = st.text_input("👤 Username", placeholder="Enter your username")
+        password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
 
-        with st.form("login_form"):
+        st.write("")
 
-            username = st.text_input("👤 Username", placeholder="Enter your username")
-            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
+        submitted = st.form_submit_button("🔓  Login to Dashboard")
 
-            submitted = st.form_submit_button("Login")
+        if submitted:
 
-            if submitted:
+            if username == "Waseem123" and password == "098765":
+                st.session_state.logged_in = True
+                st.rerun()
 
-                if username == "Waseem123" and password == "098765":
-                    st.session_state.logged_in = True
-                    st.rerun()
+            else:
+                st.error("❌ Invalid Username or Password")
 
-                else:
-                    st.error("❌ Invalid Username or Password")
-
-        st.markdown(
-            """
-            <p style='text-align:center; color:#999; font-size:12px; margin-top:15px;'>
-                Designed & Developed by Waseem Baloch
-            </p>
-            """,
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        """
+        <div class="login-footer">
+            Designed &amp; Developed by <b>Waseem Baloch</b><br>
+            MIS – M&amp;E Officer, NRSP SPHF Project
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.stop()
 
