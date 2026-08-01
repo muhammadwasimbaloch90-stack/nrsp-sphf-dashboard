@@ -32,20 +32,85 @@ if "logged_in" not in st.session_state:
 
 if not st.session_state.logged_in:
 
-    st.title("🔐 NRSP SPHF MIS Login")
+    # Custom CSS for login page
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #eafaf1 0%, #f4faf5 100%);
+        }
+        div[data-testid="stForm"] {
+            background-color: white;
+            padding: 35px 40px;
+            border-radius: 20px;
+            box-shadow: 0px 8px 30px rgba(0,0,0,0.12);
+            border: 1px solid #e0e0e0;
+        }
+        div[data-testid="stForm"] button {
+            background-color: #006400;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            height: 45px;
+            width: 100%;
+            border: none;
+        }
+        div[data-testid="stForm"] button:hover {
+            background-color: #004d00;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    # Center the login card
+    left, center, right = st.columns([1, 1.2, 1])
 
-    if st.button("Login"):
+    with center:
 
-        if username == "Waseem123" and password == "098765":
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
-            st.session_state.logged_in = True
-            st.rerun()
+        c1, c2, c3 = st.columns([1, 2, 1])
+        with c2:
+            st.image("NRSP_Logo.png", width=100)
 
-        else:
-            st.error("Invalid Username or Password")
+        st.markdown(
+            """
+            <h2 style='text-align:center; color:#006400; margin-bottom:0;'>
+                NRSP - SPHF MIS
+            </h2>
+            <p style='text-align:center; color:#666; margin-top:5px;'>
+                Please login to continue
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        with st.form("login_form"):
+
+            username = st.text_input("👤 Username", placeholder="Enter your username")
+            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
+
+            submitted = st.form_submit_button("Login")
+
+            if submitted:
+
+                if username == "Waseem123" and password == "098765":
+                    st.session_state.logged_in = True
+                    st.rerun()
+
+                else:
+                    st.error("❌ Invalid Username or Password")
+
+        st.markdown(
+            """
+            <p style='text-align:center; color:#999; font-size:12px; margin-top:15px;'>
+                Designed & Developed by Waseem Baloch
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.stop()
 
