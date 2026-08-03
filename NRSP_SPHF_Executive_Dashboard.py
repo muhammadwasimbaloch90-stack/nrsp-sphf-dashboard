@@ -493,6 +493,80 @@ st.markdown(
         border: 1px solid #e2efe6;
     }
 
+    /* ============ SEARCH FORM CARD ============ */
+    div[data-testid="stForm"] {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 22px 26px;
+        box-shadow: 0px 10px 26px rgba(0,60,30,0.08);
+        border: 1px solid #e2efe6;
+    }
+
+    /* ============ BENEFICIARY PROFILE CARD ============ */
+    .nrsp-profile-card {
+        background: linear-gradient(160deg, #ffffff, #f4faf7);
+        border-radius: 18px;
+        padding: 0 0 18px 0;
+        margin-bottom: 22px;
+        box-shadow: 0px 12px 32px rgba(0,60,30,0.12);
+        border: 1px solid #e2efe6;
+        overflow: hidden;
+    }
+    .nrsp-profile-header {
+        background: linear-gradient(120deg, #0b6e4f, #0e8a63 55%, #1565c0);
+        padding: 18px 26px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .nrsp-profile-avatar {
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.22);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+    .nrsp-profile-name {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 1.3;
+    }
+    .nrsp-profile-tag {
+        color: #dffcec;
+        font-size: 12.5px;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+    .nrsp-field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        padding: 22px 26px 6px 26px;
+    }
+    .nrsp-field {
+        background: #ffffff;
+        border: 1px solid #e9f2ec;
+        border-radius: 12px;
+        padding: 11px 15px;
+        box-shadow: 0px 3px 10px rgba(0,0,0,0.04);
+    }
+    .nrsp-field-label {
+        font-size: 11.5px;
+        color: #6d7d70;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 3px;
+    }
+    .nrsp-field-value {
+        font-size: 15px;
+        color: #16281d;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -574,6 +648,49 @@ def render_table(df):
     """
 
     st.markdown(table_html, unsafe_allow_html=True)
+
+
+def render_beneficiary_card(row, columns):
+    """Render a single beneficiary record as a polished profile/ID card.
+    Works with ANY set of columns — it does not assume a fixed schema."""
+
+    name_col = next(
+        (c for c in columns if "name" in c.lower() and "father" not in c.lower() and "husband" not in c.lower()),
+        None
+    )
+    header_name = str(row[name_col]).strip() if name_col and pd.notna(row[name_col]) else "Beneficiary Record"
+
+    id_col = next((c for c in columns if "uuid" in c.lower()), None)
+    tag_text = f"UUID: {row[id_col]}" if id_col and pd.notna(row[id_col]) else ""
+
+    fields_html = ""
+    for c in columns:
+        val = row[c]
+        display_val = _html_lib.escape(str(val).strip()) if pd.notna(val) and str(val).strip() != "" else "—"
+        fields_html += f"""
+        <div class="nrsp-field">
+            <div class="nrsp-field-label">{_html_lib.escape(str(c))}</div>
+            <div class="nrsp-field-value">{display_val}</div>
+        </div>
+        """
+
+    st.markdown(
+        f"""
+        <div class="nrsp-profile-card">
+            <div class="nrsp-profile-header">
+                <div class="nrsp-profile-avatar">👤</div>
+                <div>
+                    <div class="nrsp-profile-name">{_html_lib.escape(header_name)}</div>
+                    <div class="nrsp-profile-tag">{_html_lib.escape(tag_text)}</div>
+                </div>
+            </div>
+            <div class="nrsp-field-grid">
+                {fields_html}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # =========================
@@ -2010,6 +2127,108 @@ if search:
             result,
             use_container_width=True
         )
+
+# =========================
+# OVERALL PROJECT BENEFICIARIES (separate master sheet)
+# =========================
+
+OVERALL_SHEET_ID = "1NpWBcDN8pxcG2FPmYvwL73QizQE77gts"
+
+@st.cache_data(ttl=60)
+def load_overall_beneficiaries():
+
+    url = f"https://docs.google.com/spreadsheets/d/{OVERALL_SHEET_ID}/export?format=csv"
+
+    try:
+        odf = pd.read_csv(url)
+        odf.columns = odf.columns.str.strip()
+        return odf
+
+    except Exception as e:
+        st.error(f"Overall Beneficiaries Sheet Load Error: {e}")
+        return pd.DataFrame()
+
+section_header("🌍 Overall Project Beneficiaries")
+
+overall_df = load_overall_beneficiaries()
+
+if overall_df.empty:
+
+    st.warning(
+        "⚠️ Overall Beneficiaries data could not be loaded. "
+        "Please make sure the sheet is shared as \"Anyone with the link — Viewer\"."
+    )
+
+else:
+
+    ocol1, ocol2 = st.columns([1, 3])
+
+    with ocol1:
+        st.metric("📋 Total Overall Beneficiaries", f"{len(overall_df):,}")
+
+    with ocol2:
+        st.info(
+            "This is the complete master list of all project beneficiaries. "
+            "Search below by UUID or CNIC Number to view a full beneficiary profile."
+        )
+
+    with st.form("overall_search_form"):
+
+        sc1, sc2 = st.columns([4, 1])
+
+        with sc1:
+            overall_query = st.text_input(
+                "🔎 Search by UUID or CNIC Number",
+                placeholder="e.g. 42101-1234567-1  or  a UUID"
+            ).strip()
+
+        with sc2:
+            st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+            overall_search_submit = st.form_submit_button("🔍 Search")
+
+    if overall_search_submit:
+
+        if overall_query == "":
+
+            st.warning("Please enter a UUID or CNIC Number to search.")
+
+        else:
+
+            id_cols = [
+                c for c in overall_df.columns
+                if "uuid" in c.lower() or "cnic" in c.lower()
+            ]
+
+            if not id_cols:
+
+                st.error("❌ No UUID/CNIC column found in the Overall Beneficiaries sheet.")
+
+            else:
+
+                match_mask = pd.Series(False, index=overall_df.index)
+
+                for c in id_cols:
+                    match_mask = match_mask | (
+                        overall_df[c]
+                        .astype(str)
+                        .str.contains(overall_query, case=False, na=False)
+                    )
+
+                matches = overall_df[match_mask]
+
+                if matches.empty:
+
+                    st.error(
+                        "❌ No beneficiary found with this UUID / CNIC in the Overall Project Database."
+                    )
+
+                else:
+
+                    st.success(f"✅ {len(matches)} Record(s) Found")
+
+                    for _, matched_row in matches.iterrows():
+                        render_beneficiary_card(matched_row, overall_df.columns)
+
 # =========================
 # PROJECT STAFF
 # =========================
