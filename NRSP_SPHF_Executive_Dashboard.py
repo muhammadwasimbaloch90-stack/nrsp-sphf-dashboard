@@ -859,6 +859,9 @@ def create_pending_pdf(df_report, bank, installment):
         elif col == "Bank":
             col_widths.append(90)
 
+        elif "Withdrawal Date" in str(col) or "Withdrawal date" in str(col):
+            col_widths.append(75)
+
         elif col == "Remarks":
             col_widths.append(80)
 
@@ -1236,6 +1239,11 @@ required_columns = [
     "SPHF 4th Disbursement status Yes/No",
     "4th installment withdrawal Yes/No",
 
+    "1st Withdrawal date",
+    "2nd Withdrawal Date",
+    "3rd Withdrawal Date",
+    "4th Withdrawal Date",
+
     "Plinth Verify Yes/No",
     "Lintel Verify Yes/No",
     "Roof Verify Yes/No",
@@ -1346,6 +1354,12 @@ WD3 = "3rd installment withdrawal Yes/No"
 
 SPHF4 = "SPHF 4th Disbursement status Yes/No"
 WD4 = "4th installment withdrawal Yes/No"
+
+# Withdrawal Date columns used only for Stage Verification Pending PDF filtering
+WD_DATE1 = "1st Withdrawal date"
+WD_DATE2 = "2nd Withdrawal Date"
+WD_DATE3 = "3rd Withdrawal Date"
+WD_DATE4 = "4th Withdrawal Date"
 
 PLINTH = "Plinth Verify Yes/No"
 LINTEL = "Lintel Verify Yes/No"
@@ -1858,7 +1872,8 @@ stage = st.selectbox(
         "Lintel",
         "Roof",
         "Completion"
-    ]
+    ],
+    key="stage_name"
 )
 
 bank_option = st.selectbox(
@@ -1884,6 +1899,27 @@ if district_option != "All":
     stage_df = stage_df[
         stage_df[DISTRICT] == district_option
     ]
+
+# --------------------------
+# Select the correct withdrawal date column for the selected stage.
+# This keeps 1st/2nd/3rd/4th withdrawal dates completely separate.
+# --------------------------
+if stage == "Plinth":
+    stage_withdrawal_date_col = WD_DATE1
+elif stage == "Lintel":
+    stage_withdrawal_date_col = WD_DATE2
+elif stage == "Roof":
+    stage_withdrawal_date_col = WD_DATE3
+else:
+    stage_withdrawal_date_col = WD_DATE4
+
+# Convert dates only for filtering/display; original data is not changed.
+stage_df = stage_df.copy()
+stage_df["__WithdrawalDate"] = pd.to_datetime(
+    stage_df[stage_withdrawal_date_col],
+    errors="coerce",
+    dayfirst=True
+)
 
 # --------------------------
 # PLINTH
@@ -1933,8 +1969,47 @@ else:
         ~is_yes(stage_df[COMP])
     ]
 
-# Village A-Z
+# --------------------------
+# EXCEL-STYLE MULTI-DATE FILTER
+# --------------------------
+# Searchable multiselect. "Select All" keeps all available dates selected.
+valid_stage_dates = (
+    stage_df["__WithdrawalDate"]
+    .dropna()
+    .dt.normalize()
+    .drop_duplicates()
+    .sort_values()
+)
 
+stage_date_values = [
+    d.strftime("%d-%m-%Y") for d in valid_stage_dates
+]
+
+select_all_dates = st.checkbox(
+    "☑ Select All Withdrawal Dates",
+    value=True,
+    key="stage_select_all_dates"
+)
+
+if select_all_dates:
+    selected_stage_dates = stage_date_values
+else:
+    selected_stage_dates = st.multiselect(
+        "📅 Select Withdrawal Date(s) — multiple selection allowed",
+        stage_date_values,
+        default=stage_date_values,
+        key="stage_withdrawal_dates"
+    )
+
+if not select_all_dates:
+    selected_date_set = set(selected_stage_dates)
+    stage_df = stage_df[
+        stage_df["__WithdrawalDate"]
+        .dt.strftime("%d-%m-%Y")
+        .isin(selected_date_set)
+    ]
+
+# Village A-Z
 stage_df = stage_df.sort_values(
     "Village"
 )
@@ -1958,10 +2033,23 @@ download_cols = [
     "District",
     "Tehsil",
     "UC",
-    "Village"
+    "Village",
+    stage_withdrawal_date_col
 ]
 
 stage_download = stage_df[download_cols].copy()
+stage_download = stage_download.rename(
+    columns={stage_withdrawal_date_col: "Withdrawal Date"}
+)
+
+# Show dates consistently in the PDF.
+stage_download["Withdrawal Date"] = pd.to_datetime(
+    stage_download["Withdrawal Date"],
+    errors="coerce",
+    dayfirst=True
+).dt.strftime("%d-%m-%Y")
+stage_download["Withdrawal Date"] = stage_download["Withdrawal Date"].fillna("")
+
 stage_download["Remarks"] = ""
 
 # Village A-Z
@@ -1970,10 +2058,20 @@ stage_download = stage_download.sort_values(
     ascending=True
 )
 
+# Remove internal helper column; it never enters the PDF.
+stage_df = stage_df.drop(columns=["__WithdrawalDate"], errors="ignore")
+
+if select_all_dates:
+    date_label = "All Withdrawal Dates"
+elif selected_stage_dates:
+    date_label = ", ".join(selected_stage_dates)
+else:
+    date_label = "No Withdrawal Date Selected"
+
 pdf_stage = create_pending_pdf(
     stage_download,
     bank_option,
-    f"{stage} Verification Pending"
+    f"{stage} Verification Pending | Withdrawal Date: {date_label}"
 )
 
 st.download_button(
