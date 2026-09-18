@@ -1373,9 +1373,43 @@ selected_district = st.sidebar.selectbox(
     districts
 )
 
+df_all = df.copy()   # original data (sirf PDF ke liye)
+
 if selected_district != "All":
     df = df[df[DISTRICT].astype(str) == selected_district]
 
+
+# Sirf PDF lists ke liye Ghari rule
+def pdf_district_rule(data):
+    data = data.copy()
+
+    uc_norm = data["UC"].fillna("").astype(str).str.strip().str.lower()
+    dist_norm = (
+        data["District"].fillna("").astype(str)
+        .str.strip().str.lower().str.replace(" ", "", regex=False)
+    )
+
+    ghari_in_jaffarabad = (
+        uc_norm.eq("ghari") &
+        dist_norm.str.contains("jaf+arabad", regex=True)
+    )
+
+    # Sheet me Sohbatpur ki jo spelling hai wohi use hogi
+    sohbat_labels = data.loc[
+        dist_norm.str.contains("so(?:h)?batpur", regex=True), "District"
+    ]
+    target = sohbat_labels.iloc[0] if len(sohbat_labels) else "Sohbatpur"
+
+    data.loc[ghari_in_jaffarabad, "District"] = target
+    return data
+
+
+pdf_base = pdf_district_rule(df_all)
+
+if selected_district != "All":
+    pdf_base = pdf_base[
+        pdf_base[DISTRICT].astype(str) == selected_district
+    ]
 
 # =========================
 # INSTALLMENT LOGIC
@@ -1735,40 +1769,40 @@ installment = st.selectbox(
 
 if installment == "1st Installment":
 
-    pending_df = df[
-    is_yes(df[SPHF1]) &
-    ~is_yes(df[WD1]) &
-    no_remarks(df[REMARKS]) &
-    (df[BANK] == selected_bank)
-]
+    pending_df = pdf_base[
+        is_yes(pdf_base[SPHF1]) &
+        ~is_yes(pdf_base[WD1]) &
+        no_remarks(pdf_base[REMARKS]) &
+        (pdf_base[BANK] == selected_bank)
+    ]
 
 elif installment == "2nd Installment":
 
-    pending_df = df[
-    is_yes(df[SPHF2]) &
-    ~is_yes(df[WD2]) &
-    no_remarks(df[REMARKS]) &
-    (df[BANK] == selected_bank)
-]
+    pending_df = pdf_base[
+        is_yes(pdf_base[SPHF2]) &
+        ~is_yes(pdf_base[WD2]) &
+        no_remarks(pdf_base[REMARKS]) &
+        (pdf_base[BANK] == selected_bank)
+    ]
 
 elif installment == "3rd Installment":
 
-    pending_df = df[
-    is_yes(df[SPHF3]) &
-    ~is_yes(df[WD3]) &
-    no_remarks(df[REMARKS]) &
-    (df[BANK] == selected_bank)
-]
-    
+    pending_df = pdf_base[
+        is_yes(pdf_base[SPHF3]) &
+        ~is_yes(pdf_base[WD3]) &
+        no_remarks(pdf_base[REMARKS]) &
+        (pdf_base[BANK] == selected_bank)
+    ]
+
 else:
 
-    pending_df = df[
-    is_yes(df[SPHF4]) &
-    ~is_yes(df[WD4]) &
-    no_remarks(df[REMARKS]) &
-    (df[BANK] == selected_bank)
-]
-
+    pending_df = pdf_base[
+        is_yes(pdf_base[SPHF4]) &
+        ~is_yes(pdf_base[WD4]) &
+        no_remarks(pdf_base[REMARKS]) &
+        (pdf_base[BANK] == selected_bank)
+    ]
+    
 st.info(
     f"Total Pending Beneficiaries: {len(pending_df)}"
 )
@@ -1839,7 +1873,7 @@ district_option = st.selectbox(
     key="stage_district"
 )
 
-stage_df = df.copy()
+stage_df = pdf_base.copy()
 
 if bank_option != "All":
     stage_df = stage_df[
