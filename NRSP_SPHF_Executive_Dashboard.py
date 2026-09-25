@@ -733,200 +733,125 @@ def load_staff():
         return pd.DataFrame()
 
 def create_pending_pdf(df_report, bank, installment):
+    """Create an A4 landscape PDF with wrapped cells and a table fitted to page width."""
+    from reportlab.platypus import LongTable
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER
+    from reportlab.lib.units import mm
 
     buffer = BytesIO()
-
+    page_size = landscape(A4)
+    left_margin = right_margin = 8 * mm
+    top_margin = bottom_margin = 12 * mm
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=landscape(A4),
-        leftMargin=10,
-        rightMargin=10,
-        topMargin=20,
-        bottomMargin=20
+        pagesize=page_size,
+        leftMargin=left_margin,
+        rightMargin=right_margin,
+        topMargin=top_margin,
+        bottomMargin=bottom_margin,
+        title=f"{installment} - {bank} Pending Withdrawal Report",
     )
 
     styles = getSampleStyleSheet()
-
     elements = []
 
-    # =========================
-    # LOGOS
-    # =========================
-
+    # Logos (retain the existing branding)
     try:
-        logo1 = Image(
-            NRSP_LOGO,
-            width=90,
-            height=40
-        )
-
-        logo2 = Image(
-            SPHF_LOGO,
-            width=90,
-            height=40
-        )
-
-        logo_table = Table(
-            [[logo1, "", logo2]],
-                colWidths=[120, 450, 120]
-        )
-
-        logo_table.setStyle(
-            TableStyle([
-                ("ALIGN", (0, 0), (0, 0), "LEFT"),
-                ("ALIGN", (2, 0), (2, 0), "RIGHT"),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE")
-            ])
-        )
-
-        elements.append(logo_table)
-        elements.append(Spacer(1, 10))
-
+        logo1 = Image(NRSP_LOGO, width=75, height=34)
+        logo2 = Image(SPHF_LOGO, width=75, height=34)
+        logo_table = Table([[logo1, "", logo2]], colWidths=[90, 600, 90])
+        logo_table.setStyle(TableStyle([
+            ("ALIGN", (0, 0), (0, 0), "LEFT"),
+            ("ALIGN", (2, 0), (2, 0), "RIGHT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+        elements.extend([logo_table, Spacer(1, 7)])
     except Exception:
         pass
 
-    # =========================
-    # TITLE
-    # =========================
+    title_style = ParagraphStyle(
+        "PendingReportTitle", parent=styles["Title"], fontName="Helvetica-Bold",
+        fontSize=13, leading=15, alignment=TA_CENTER, spaceAfter=4,
+    )
+    meta_style = ParagraphStyle(
+        "PendingReportMeta", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=8, leading=10, alignment=TA_CENTER,
+    )
+    elements.append(Paragraph("NRSP - SPHF Monitoring Report", title_style))
+    elements.append(Paragraph(
+        f"Report: {_html_lib.escape(str(installment))} &nbsp;&nbsp; | &nbsp;&nbsp; "
+        f"Bank: {_html_lib.escape(str(bank))} &nbsp;&nbsp; | &nbsp;&nbsp; "
+        f"Total Beneficiaries: {len(df_report)}", meta_style
+    ))
+    elements.append(Spacer(1, 8))
 
-    title = Paragraph(
-    f"""
-    <b>NRSP - SPHF Monitoring Report</b><br/>
-    <br/>
-    Report : {installment}
-    <br/>
-    Bank : {bank}
-    <br/>
-    Total Beneficiaries : {len(df_report)}
-    """,
-    styles["Title"]
-)
-    
-    elements.append(title)
-    elements.append(Spacer(1, 12))
-
-    # =========================
-    # TABLE
-    # =========================
-
-
-    # Use exactly the columns received from caller
     available_columns = df_report.columns.tolist()
+    usable_width = page_size[0] - left_margin - right_margin
 
-    table_data = [available_columns]
-    table_data += df_report.fillna("").values.tolist()
+    # Relative widths keep the table inside A4 landscape regardless of column count.
+    width_weights = {
+        "S. No.": 0.45, "UUID": 0.85, "Beneficiary Name": 1.35,
+        "Father/Husband Name": 1.45, "Mobile Number": 1.0, "Gender": 0.55,
+        "CNIC No.": 1.15, "District": 0.9, "Tehsil": 0.85, "UC": 0.7,
+        "Village": 1.35, "Account No.": 1.35, "Bank": 1.15,
+        "Remarks": 1.2,
+    }
+    weights = [width_weights.get(str(c), 1.0) for c in available_columns]
+    total_weight = sum(weights) or 1
+    col_widths = [usable_width * w / total_weight for w in weights]
 
-    col_widths = []
-
-    for col in available_columns:
-
-        if col == "S. No.":
-            col_widths.append(25)
-
-        elif col == "UUID":
-            col_widths.append(55)
-
-        elif col == "Beneficiary Name":
-            col_widths.append(90)
-
-        elif col == "Father/Husband Name":
-            col_widths.append(100)
-
-        elif col == "Mobile Number":
-            col_widths.append(70)
-
-        elif col == "Gender":
-            col_widths.append(40)
-
-        elif col == "CNIC No.":
-            col_widths.append(75)
-
-        elif col == "District":
-            col_widths.append(55)
-
-        elif col == "Tehsil":
-            col_widths.append(50)
-
-        elif col == "UC":
-            col_widths.append(45)
-
-        elif col == "Village":
-            col_widths.append(110)
-
-        elif col == "Account No.":
-            col_widths.append(95)
-
-        elif col == "Bank":
-            col_widths.append(90)
-
-        elif "Withdrawal Date" in str(col) or "Withdrawal date" in str(col):
-            col_widths.append(75)
-
-        elif col == "Remarks":
-            col_widths.append(80)
-
-        else:
-            col_widths.append(70)
-    
-    table = Table(
-        table_data,
-        colWidths=col_widths,
-        repeatRows=1
+    # Reduce font a little for wide reports; Paragraph handles line wrapping in every cell.
+    ncols = max(1, len(available_columns))
+    body_font = 6.5 if ncols <= 10 else (5.8 if ncols <= 14 else 5.2)
+    header_font = min(7, body_font + 0.3)
+    cell_style = ParagraphStyle(
+        "PDFCell", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=body_font, leading=body_font + 1.2, alignment=TA_CENTER,
+        wordWrap="CJK", splitLongWords=1, spaceAfter=0, spaceBefore=0,
+    )
+    header_style = ParagraphStyle(
+        "PDFHeader", parent=cell_style, fontName="Helvetica-Bold",
+        fontSize=header_font, leading=header_font + 1.2,
     )
 
-    table.setStyle(
-        TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+    table_data = [[Paragraph(_html_lib.escape(str(c)), header_style) for c in available_columns]]
+    for values in df_report.fillna("").astype(str).itertuples(index=False, name=None):
+        row_cells = []
+        for value in values:
+            safe_value = _html_lib.escape(str(value)).replace("\n", "<br/>")
+            row_cells.append(Paragraph(safe_value if safe_value else " ", cell_style))
+        table_data.append(row_cells)
 
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-
-            ("FONTSIZE", (0, 0), (-1, 0), 8),
-            ("FONTSIZE", (0, 1), (-1, -1), 7),
-
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-            ("BOX", (0, 0), (-1, -1), 1, colors.black),
-
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
-            ("TOPPADDING", (0, 1), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 1), (-1, -1), 4),
-        ])
+    table = LongTable(
+        table_data, colWidths=col_widths, repeatRows=1,
+        hAlign="LEFT", splitByRow=1, repeatCols=0,
     )
-
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9D9D9")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.black),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.black),
+        ("LEFTPADDING", (0, 0), (-1, -1), 2),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
     elements.append(table)
-    elements.append(Spacer(1, 15))
-
-    # =========================
-    # FOOTER
-    # =========================
-
-    footer = Paragraph(
-        """
-        <para align="center">
-        <font size="9">
-        Designed &amp; Developed by <b>Waseem Baloch</b>
-        </font>
-        </para>
-        """,
-        styles["Normal"]
+    elements.append(Spacer(1, 8))
+    footer_style = ParagraphStyle(
+        "PDFFooter", parent=styles["Normal"], fontSize=7, leading=9,
+        alignment=TA_CENTER,
     )
-
-    elements.append(footer)
-
-    # =========================
-    # BUILD PDF
-    # =========================
+    elements.append(Paragraph(
+        'Designed &amp; Developed by <b>Waseem Baloch</b>', footer_style
+    ))
 
     doc.build(elements)
-
     pdf = buffer.getvalue()
-
     buffer.close()
-
     return pdf
 
 from reportlab.pdfbase import pdfmetrics
