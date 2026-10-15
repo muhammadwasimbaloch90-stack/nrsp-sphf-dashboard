@@ -708,6 +708,57 @@ def load_data():
     try:
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
+
+        # ------------------------------------------------------------
+        # Withdrawal Date / Verification columns are mapped by their
+        # POSITION in the sheet (Excel letter), so header text or
+        # duplicate headers can never break the dashboard.
+        #   1st : Q  = 1st Withdrawal date , R  = Plinth Verify
+        #   2nd : V  = 2nd Withdrawal Date , W  = Lintel Verify
+        #   3rd : AA = 3rd Withdrawal Date , AB = Roof Verify
+        #   4th : AF = 4th Withdrawal Date , AG = Completion
+        # ------------------------------------------------------------
+        def _col_idx(letters):
+            n = 0
+            for ch in letters.upper():
+                n = n * 26 + (ord(ch) - 64)
+            return n - 1
+
+        POSITION_MAP = {
+            "Q":  "1st Withdrawal date",
+            "R":  "Plinth Verify Yes/No",
+            "V":  "2nd Withdrawal Date",
+            "W":  "Lintel Verify Yes/No",
+            "AA": "3rd Withdrawal Date",
+            "AB": "Roof Verify Yes/No",
+            "AF": "4th Withdrawal Date",
+            "AG": "Completion Yes/No",
+        }
+
+        cols = df.columns.tolist()
+        targets = set(POSITION_MAP.values())
+        positions = {_col_idx(k): v for k, v in POSITION_MAP.items()}
+
+        if max(positions) >= len(cols):
+            st.error(
+                "❌ Google Sheet me expected columns (up to AG) nahi mile. "
+                "Sheet ka structure check karein."
+            )
+            st.stop()
+
+        # Purane / duplicate columns jinke naam target names se match karte hain
+        # (lekin naye positions par nahi hain) unhe hata do.
+        drop_idx = [
+            i for i, c in enumerate(cols)
+            if (c in targets or any(c == t + f".{n}" for t in targets for n in range(1, 4)))
+            and i not in positions
+        ]
+        for i, name in positions.items():
+            cols[i] = name
+        df.columns = cols
+        if drop_idx:
+            df = df.iloc[:, [i for i in range(len(cols)) if i not in drop_idx]]
+
         return df
 
     except Exception as e:
