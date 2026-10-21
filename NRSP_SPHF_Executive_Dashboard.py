@@ -158,7 +158,7 @@ if not st.session_state.logged_in:
 
         if submitted:
 
-            if username == "Waseem_baloch" and password == "Waseem.b@":
+            if username == "Waseem_baloch" and password == "Waseem.b#":
                 st.session_state.logged_in = True
                 st.rerun()
 
